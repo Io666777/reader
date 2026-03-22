@@ -1,15 +1,12 @@
-import type { Context } from "hono";
-import prisma from "../../lib/prisma";
-
-export const getBooks = async (c: Context) => {
+import prisma from "../../lib/prisma.js";
+export const getBooks = async (c) => {
     const isbn = c.req.query('isbn');
     try {
-        const response = await fetch(`${process.env.API_URL}?bibkeys=ISBN:${isbn}&format=json&jscmd=data`)
+        const response = await fetch(`${process.env.API_URL}?bibkeys=ISBN:${isbn}&format=json&jscmd=data`);
         const data = await response.json();
-
         const bookData = data[`ISBN:${isbn}`];
-        if (!bookData) return c.json({ error: 'Book not found' }, 404);
-
+        if (!bookData)
+            return c.json({ error: 'Book not found' }, 404);
         const newBook = await prisma.book.create({
             data: {
                 bookName: bookData.title,
@@ -17,9 +14,10 @@ export const getBooks = async (c: Context) => {
                 image: bookData.cover.large,
                 realiseYear: bookData.publish_date,
             }
-        })
+        });
         return c.json(newBook);
-    } catch (error) {
+    }
+    catch (error) {
         return c.json({ error: 'Internal server error' }, 500);
     }
-}
+};
