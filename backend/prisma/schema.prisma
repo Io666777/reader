@@ -13,6 +13,7 @@ datasource db {
 
 model Book {
   id           String  @id @default(uuid())
+  isbn        String   @unique
   bookName    String?
   authorName  String?
   image        String?
