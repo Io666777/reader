@@ -1,6 +1,16 @@
 import type { Context } from "hono";
 import prisma from "../../lib/prisma";
 
+export const getAll = async (c: Context) => {
+  try {
+    const books = await prisma.book.findMany(); 
+    return c.json(books);
+  } catch (error) {
+    console.error('Error fetching books:', error);
+    return c.json({ error: 'Не удалось получить список книг' }, 500);
+  }
+};
+
 export const getBooks = async (c: Context) => {
     const isbn = c.req.query('isbn');
 
@@ -13,17 +23,10 @@ export const getBooks = async (c: Context) => {
             where: { isbn: isbn }
         });
 
-        if (existingBook) {
+    if (existingBook) return c.json(existingBook);
         
-            return c.json({ 
-                message: 'Book already exists', 
-                book: existingBook 
-            });
-        }
-        const apiUrl = process.env.API_URL
         const response = await fetch(`${process.env.API_URL}?bibkeys=ISBN:${isbn}&format=json&jscmd=data`)
         const data = await response.json();
-
         const bookData = data[`ISBN:${isbn}`];
 
         if (!bookData) return c.json({ error: 'Book not found' }, 404);
@@ -37,8 +40,9 @@ export const getBooks = async (c: Context) => {
                 realiseYear: bookData.publish_date,
             }
         })
-        return c.json(newBook);
+        return c.json(newBook, 201);
     } catch (error) {
+        console.error(error);
         return c.json({ error: 'Internal server error' }, 500);
     }
 }
