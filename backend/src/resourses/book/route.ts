@@ -1,9 +1,9 @@
 import { Hono } from "hono";
-import * as controller from "./controller"
+import * as controller from "./crud.controller"
 
 const bookRoute = new Hono();
 bookRoute.get('/', controller.getAll);
-bookRoute.get('/import', controller.getBooks);
+bookRoute.get('/add', controller.addBook);
 bookRoute.delete('/:id', controller.deleteBook)
 
 
