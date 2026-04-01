@@ -15,6 +15,7 @@ export default defineConfig({
       scss: {
         // Здесь можно подключить глобальные переменные (цвета, сетку)
         // additionalData: `@import "@/app/styles/_variables.scss";`
+        additionalData: `@import "@/shared/styles/_mixins.scss";`
       }
     }
   }
