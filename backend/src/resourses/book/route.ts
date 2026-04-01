@@ -4,7 +4,7 @@ import * as serch from "../serch/serch.controller"
 
 const bookRoute = new Hono();
 bookRoute.get('/', controller.getAll);
-bookRoute.get('/add', controller.addBook);
+bookRoute.post('/add', controller.addBook);
 bookRoute.delete('/:id', controller.deleteBook)
 
 
