@@ -1,9 +1,7 @@
 <script setup lang="ts">
-import bookCatalog from '../widgets/book/bookCatalog.vue';
-import sidebar from '../widgets/sidebar/index.vue'
+    import defaultPage from '../pages/defaultPage.vue';
 </script>
 
 <template>
-<!-- <bookCatalog /> -->
-<sidebar></sidebar>
+    <defaultPage />
 </template>

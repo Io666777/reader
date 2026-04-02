@@ -4,4 +4,5 @@ import baseButton from '../../shared/ui/button.vue';
 
 <template>
     <baseButton to="/" type="transition">спиоск книг</baseButton>
+    <baseButton to="/catalog" type="transition">каталог книг</baseButton>
 </template>
