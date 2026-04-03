@@ -19,7 +19,7 @@ import sidebar from '../widgets/sidebar/index.vue';
     background: #f8f9fa  // Легкий фон для контраста
     
 .page-content
-    padding: 24px 32px  // Отступы вокруг контента
+    padding: 24px 42px  // Отступы вокруг контента
     overflow-x: auto    // Если контент не влезает по ширине
     
     // Адаптация для маленьких экранов
