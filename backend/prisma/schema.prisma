@@ -1,8 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -12,11 +7,40 @@ datasource db {
 }
 
 model Book {
-  id           String  @id @default(uuid())
-  isbn        String   @unique
-  bookName    String?
-  authorName  String?
+  id           String   @id @default(uuid())
+  isbn         String   @unique
+  bookName     String?
   image        String?
-  realiseYear String?
+  realiseYear  String?
+  authorId     String
+  author       Author   @relation(fields: [authorId], references: [id])
+  createdAt    DateTime @default(now())
+  userBooks    UserBook[]
+}
+
+model Author {
+  id        String   @id @default(uuid())
+  name      String?
+  books     Book[]
   createdAt DateTime @default(now())
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  username  String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  userBooks UserBook[]
+}
+
+model UserBook {
+  id     String @id @default(uuid())
+  userId String
+  bookId String
+
+  user User @relation(fields: [userId], references: [id])
+  book Book @relation(fields: [bookId], references: [id])
+
+  @@unique([userId, bookId])
 }
