@@ -13,23 +13,31 @@ export const getAll = async (c: Context) => {
 
 export const addBook = async (c: Context) => {
   try {
-    // Получаем данные книги из тела запроса (с фронтенда)
     const body = await c.req.json();
 
     const newBook = await prisma.book.create({
       data: {
         isbn: body.isbn,
         bookName: body.title,
-        authorName: body.author,
         image: body.cover,
         realiseYear: String(body.year),
+        author: {
+          connectOrCreate: {
+            // Теперь ищем по ИМЕНИ, а не по ID
+            where: { name: body.author }, 
+            create: { name: body.author }
+          }
+        }
+      },
+      include: {
+        author: true 
       }
     });
 
     return c.json(newBook, 201);
   } catch (error) {
-    console.error(error);
-    return c.json({ error: 'Could not save book' }, 500);
+    console.error('Prisma Error:', error);
+    return c.json({ error: 'Ошибка сохранения: возможно, такой ISBN уже есть' }, 500);
   }
 };
 

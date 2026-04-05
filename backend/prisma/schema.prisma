@@ -7,30 +7,30 @@ datasource db {
 }
 
 model Book {
-  id           String   @id @default(uuid())
-  isbn         String   @unique
-  bookName     String?
-  image        String?
-  realiseYear  String?
-  authorId     String
-  author       Author   @relation(fields: [authorId], references: [id])
-  createdAt    DateTime @default(now())
-  userBooks    UserBook[]
+  id          String     @id @default(uuid())
+  isbn        String     @unique
+  bookName    String?
+  image       String?
+  realiseYear String?
+  authorId    String
+  author      Author     @relation(fields: [authorId], references: [id])
+  createdAt   DateTime   @default(now())
+  userBooks   UserBook[]
 }
 
 model Author {
   id        String   @id @default(uuid())
-  name      String?
+  name      String   @unique
   books     Book[]
   createdAt DateTime @default(now())
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  username  String   @unique
+  id        String     @id @default(uuid())
+  email     String     @unique
+  username  String     @unique
   password  String
-  createdAt DateTime @default(now())
+  createdAt DateTime   @default(now())
   userBooks UserBook[]
 }
 
