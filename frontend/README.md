@@ -27,3 +27,6 @@ src/
 ├── shared/             # Переиспользуемый "фундамент"
 │   ├── api/            # Базовый инстанс axios/fetch
 │   └── ui/             # Кнопки, инпуты, лоадеры (BaseButton.vue)
+
+### Библиотеки
+npm install axios

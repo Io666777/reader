@@ -3,10 +3,12 @@ import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
 import{ cors } from 'hono/cors'
 import bookRoute from './resourses/book/route'
+import { trimTrailingSlash } from "hono/trailing-slash";
 
 const app = new Hono()
 
 app.use('*', cors())
+app.use('*', trimTrailingSlash())
 app.route('/book', bookRoute)
 
 
