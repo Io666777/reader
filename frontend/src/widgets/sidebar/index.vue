@@ -10,6 +10,7 @@ import baseButton from '../../shared/ui/button.vue';
     <div class="situation__buttons">
       <baseButton to="/" type="transition">список книг</baseButton>
       <baseButton to="/catalog" type="transition">каталог книг</baseButton>
+      <!-- <baseButton to="/catalog" type="transition">каталог книг</baseButton> -->
     </div>
   </aside>
 </template>

@@ -2,11 +2,11 @@
 import { ref, reactive } from 'vue'
 import bookLibrary from '../../widgets/book/bookCatalog.vue'
 import baseButton from '../../shared/ui/button.vue'
+import baseInput from '../../shared/ui/input.vue' // Импортируем новый инпут
 
 const searchQuery = ref('')
 const showFilters = ref(false)
 
-// Группируем данные фильтров в один объект
 const filters = reactive({
     genre: 'Все',
     year: 'Все',
@@ -15,7 +15,6 @@ const filters = reactive({
 })
 
 const applyFilters = () => {
-    console.log('Применяем фильтры:', filters)
     showFilters.value = false
 }
 
@@ -31,14 +30,10 @@ const resetFilters = () => {
 <template>
     <div class="search-page">
         <header class="search-header">
-            <div class="search-input-wrapper">
-                <input 
-                    v-model="searchQuery" 
-                    type="text" 
-                    placeholder="введите название книги"
-                    class="search-input"
-                />
-            </div>
+            <baseInput 
+                v-model="searchQuery" 
+                placeholder="введите название книги" 
+            />
             <baseButton @click="showFilters = true" type="transition">
                 Фильтры
             </baseButton>
@@ -61,31 +56,25 @@ const resetFilters = () => {
                         </div>
 
                         <div class="filter-group">
-                            <label>Год издания</label>
-                            <select v-model="filters.year" class="filter-select">
-                                <option>Все</option>
-                                <option>2024</option>
-                                <option>2023</option>
-                                <option>2022</option>
-                            </select>
-                        </div>
-
-                        <div class="filter-group">
                             <label>Цена (₽)</label>
                             <div class="price-range">
-                                <input v-model.number="filters.priceFrom" type="number" placeholder="от" class="price-input" />
+                                <baseInput 
+                                    v-model.number="filters.priceFrom" 
+                                    type="number" 
+                                    placeholder="от" 
+                                />
                                 <span class="divider">-</span>
-                                <input v-model.number="filters.priceTo" type="number" placeholder="до" class="price-input" />
+                                <baseInput 
+                                    v-model.number="filters.priceTo" 
+                                    type="number" 
+                                    placeholder="до" 
+                                />
                             </div>
                         </div>
 
                         <div class="filter-actions">
-                            <baseButton type="add" size="medium" @click="applyFilters">
-                                Применить
-                            </baseButton>
-                            <baseButton type="transition" size="medium" @click="resetFilters">
-                                Сбросить
-                            </baseButton>
+                            <baseButton type="add" @click="applyFilters">Применить</baseButton>
+                            <baseButton type="transition" @click="resetFilters">Сбросить</baseButton>
                         </div>
                     </div>
                 </div>
@@ -97,6 +86,7 @@ const resetFilters = () => {
 </template>
 
 <style lang="sass" scoped>
+// Стили стали намного короче!
 .search-page
     padding: 20px
     background: #f8f9fa
@@ -109,18 +99,6 @@ const resetFilters = () => {
     align-items: center
     max-width: 800px
 
-.search-input
-    width: 100%
-    padding: 12px 20px
-    border: 1px solid #ddd
-    border-radius: 12px
-    font-size: 16px
-    outline: none
-    transition: border-color 0.2s
-    &:focus
-        border-color: #2196f3
-
-// Стили модалки
 .filters-modal
     position: fixed
     top: 0
@@ -138,13 +116,8 @@ const resetFilters = () => {
     background: white
     padding: 30px
     border-radius: 20px
-    width: 100%
+    width: 90%
     max-width: 400px
-    box-shadow: 0 20px 40px rgba(0,0,0,0.1)
-
-    h3
-        margin: 0 0 24px
-        font-size: 22px
 
 .filter-group
     margin-bottom: 20px
@@ -154,29 +127,25 @@ const resetFilters = () => {
         font-weight: 600
         font-size: 14px
 
-.filter-select, .price-input
+.filter-select
     width: 100%
     padding: 12px
     border: 1px solid #eee
-    border-radius: 10px
+    border-radius: 12px
     background: #fdfdfd
 
 .price-range
     display: flex
     gap: 10px
     align-items: center
-    .divider
-        color: #ccc
 
 .filter-actions
     display: flex
     gap: 12px
     margin-top: 30px
-    // Растягиваем кнопки baseButton на всю ширину
     & > *
         flex: 1
 
-// Анимация появления
 .fade-enter-active, .fade-leave-active
     transition: opacity 0.3s ease
 .fade-enter-from, .fade-leave-to
