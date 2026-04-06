@@ -1,11 +1,14 @@
 import { Hono } from "hono";
-import * as controller from "./crud.controller"
+import { addBook } from "./CRUD/addBook"
+import { deleteBook } from "./CRUD/deleteBook"
+import { getAll } from "./CRUD/getAll"
+
 import * as serch from "../serch/serch.controller"
 
 const bookRoute = new Hono();
-bookRoute.get('/', controller.getAll);
-bookRoute.post('/add', controller.addBook);
-bookRoute.delete('/:id', controller.deleteBook)
+bookRoute.get('/', getAll);
+bookRoute.post('/add', addBook);
+bookRoute.delete('/:id', deleteBook);
 
 
 bookRoute.get('/search', serch.searchExternal)
