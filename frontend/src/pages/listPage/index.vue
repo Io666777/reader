@@ -16,6 +16,7 @@ const searchQuery = ref('')
     <header class="library-header">
       <div class="search-wrapper">
         <baseInput 
+        mode="local"
           v-model="searchQuery" 
           placeholder="Поиск в моей библиотеке..." 
         />

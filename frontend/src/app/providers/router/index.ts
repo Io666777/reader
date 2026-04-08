@@ -1,12 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import libraryPage from '../../../pages/libraryPage/index.vue'
+import listPage from '../../../pages/listPage/index.vue'
 import catalogPage from '../../../pages/catalogPage/index.vue'
 
 const routes = [
     {
         path: '/',
         name: 'home',
-        component:libraryPage,
+        component:listPage,
     },
     {
         path: '/catalog',

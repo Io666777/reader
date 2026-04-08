@@ -1,153 +1,133 @@
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
-import bookLibrary from '../../widgets/book/bookCatalog.vue'
-import baseButton from '../../shared/ui/button.vue'
-import baseInput from '../../shared/ui/input.vue' // Импортируем новый инпут
+import { ref, reactive, watch } from 'vue';
+import bookLibrary from '../../widgets/book/bookCatalog.vue';
+import baseButton from '../../shared/ui/button.vue';
+import baseInput from '../../shared/ui/input.vue';
+import bookCard from '../../entities/book/bookCard.vue';
+import type { ExternalBook } from './types.ts';
 
-const searchQuery = ref('')
-const showFilters = ref(false)
+const searchQuery = ref('');
+const externalBooks = ref<ExternalBook[]>([]); // Книги из внешнего API
+const isLoading = ref(false);
 
+// Функция поиска через Open Library (твой бэкэнд)
+const searchBooks = async (title: string) => {
+  if (title.length < 3) {
+    externalBooks.value = [];
+    return;
+  }
+  isLoading.value = true;
+  try {
+    const response = await fetch(
+      `http://localhost:3000/book/search?title=${encodeURIComponent(title)}`
+    );
+    externalBooks.value = await response.json(); // Данные из serch.controller.ts
+  } catch (e) {
+    console.error('Ошибка:', e);
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+// Дебаунс для ввода
+let timeout: any;
+watch(searchQuery, (newVal) => {
+  clearTimeout(timeout);
+  timeout = setTimeout(() => searchBooks(newVal), 500);
+});
+
+// Состояние фильтров
+const showFilters = ref(false);
 const filters = reactive({
-    genre: 'Все',
-    year: 'Все',
-    priceFrom: null,
-    priceTo: null
-})
+  /* ... твои фильтры ... */
+});
 
-const applyFilters = () => {
-    showFilters.value = false
-}
+const saveToMyLibrary = async (book: ExternalBook) => {
+  try {
+    // Вызываем ваш API (маршрут /book/add в route.ts)
+    const response = await fetch('http://localhost:3000/book/add', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      // Передаем данные в формате, который ожидает addBook.ts
+      body: JSON.stringify({
+        isbn: book.isbn,
+        title: book.title,
+        cover: book.cover,
+        year: book.year,
+        author: book.author, // Бэкенд сам создаст автора через connectOrCreate
+      }),
+    });
 
-const resetFilters = () => {
-    filters.genre = 'Все'
-    filters.year = 'Все'
-    filters.priceFrom = null
-    filters.priceTo = null
-    showFilters.value = false
-}
+    if (response.ok) {
+      alert(`Книга "${book.title}" успешно добавлена в вашу библиотеку!`);
+      // Очищаем поиск, чтобы вернуться к основному каталогу
+      searchQuery.value = '';
+      externalBooks.value = [];
+    } else {
+      const errorData = await response.json();
+      alert(errorData.error || 'Произошла ошибка при сохранении');
+    }
+  } catch (error) {
+    console.error('Ошибка при отправке запроса:', error);
+    alert('Не удалось связаться с сервером');
+  }
+};
 </script>
 
 <template>
-    <div class="search-page">
-        <header class="search-header">
-            <baseInput 
-                v-model="searchQuery" 
-                placeholder="введите название книги" 
-            />
-            <baseButton @click="showFilters = true" type="transition">
-                Фильтры
-            </baseButton>
-        </header>
+  <div class="search-page">
+    <header class="search-header">
+      <baseInput
+        mode="external"
+        v-model="searchQuery"
+        placeholder="Введите название книги..."
+      />
+      <baseButton @click="showFilters = true" type="transition"
+        >Фильтры</baseButton
+      >
+    </header>
 
-        <Teleport to="body">
-            <Transition name="fade">
-                <div v-if="showFilters" class="filters-modal" @click.self="showFilters = false">
-                    <div class="filters-content">
-                        <h3>Параметры поиска</h3>
-                        
-                        <div class="filter-group">
-                            <label>Жанр</label>
-                            <select v-model="filters.genre" class="filter-select">
-                                <option>Все</option>
-                                <option>Роман</option>
-                                <option>Детектив</option>
-                                <option>Фантастика</option>
-                            </select>
-                        </div>
+<main class="content">
+  <div v-if="isLoading" class="status">Ищем в сети...</div>
 
-                        <div class="filter-group">
-                            <label>Цена (₽)</label>
-                            <div class="price-range">
-                                <baseInput 
-                                    v-model.number="filters.priceFrom" 
-                                    type="number" 
-                                    placeholder="от" 
-                                />
-                                <span class="divider">-</span>
-                                <baseInput 
-                                    v-model.number="filters.priceTo" 
-                                    type="number" 
-                                    placeholder="до" 
-                                />
-                            </div>
-                        </div>
-
-                        <div class="filter-actions">
-                            <baseButton type="add" @click="applyFilters">Применить</baseButton>
-                            <baseButton type="transition" @click="resetFilters">Сбросить</baseButton>
-                        </div>
-                    </div>
-                </div>
-            </Transition>
-        </Teleport>
-
-        <bookLibrary :search-query="searchQuery" :filters="filters" />
+  <div v-else-if="externalBooks.length > 0" class="book-grid">
+    <div v-for="book in externalBooks" :key="book.isbn" class="external-book-wrapper">
+       <bookCard 
+          :book="{
+            bookName: book.title,
+            image: book.cover ?? undefined,
+            realiseYear: String(book.year),
+            author: { name: book.author },
+          }"
+        />
+        <baseButton type="add" @click="saveToMyLibrary(book)">+</baseButton>
     </div>
+  </div>
+
+  <bookLibrary 
+    v-else-if="searchQuery.trim() === ''" 
+    :key="'library-' + searchQuery"
+    :filters="filters" 
+  />
+
+  <div v-else-if="searchQuery.length > 2" class="status">
+    В сети ничего не найдено
+  </div>
+</main>
+  </div>
 </template>
 
 <style lang="sass" scoped>
-// Стили стали намного короче!
-.search-page
-    padding: 20px
-    background: #f8f9fa
-    min-height: 100vh
+.book-grid
+  display: grid
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr))
+  gap: 24px
+  margin-top: 20px
 
-.search-header
-    display: flex
-    gap: 12px
-    margin-bottom: 32px
-    align-items: center
-    max-width: 800px
-
-.filters-modal
-    position: fixed
-    top: 0
-    left: 0
-    width: 100%
-    height: 100%
-    background: rgba(0, 0, 0, 0.4)
-    backdrop-filter: blur(4px)
-    display: flex
-    align-items: center
-    justify-content: center
-    z-index: 9999
-
-.filters-content
-    background: white
-    padding: 30px
-    border-radius: 20px
-    width: 90%
-    max-width: 400px
-
-.filter-group
-    margin-bottom: 20px
-    label
-        display: block
-        margin-bottom: 8px
-        font-weight: 600
-        font-size: 14px
-
-.filter-select
-    width: 100%
-    padding: 12px
-    border: 1px solid #eee
-    border-radius: 12px
-    background: #fdfdfd
-
-.price-range
-    display: flex
-    gap: 10px
-    align-items: center
-
-.filter-actions
-    display: flex
-    gap: 12px
-    margin-top: 30px
-    & > *
-        flex: 1
-
-.fade-enter-active, .fade-leave-active
-    transition: opacity 0.3s ease
-.fade-enter-from, .fade-leave-to
-    opacity: 0
+.external-book-wrapper
+  display: flex
+  flex-direction: column
+  gap: 10px
 </style>
