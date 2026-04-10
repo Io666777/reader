@@ -1,23 +1,29 @@
-// import { createRouter, createWebHistory } from 'vue-router'
-// // import listPage from '../../../pages/listPage/index.vue'
-// // import catalogPage from '../../../pages/catalogPage/index.vue'
+import { createRouter, createWebHistory } from 'vue-router'
+import pageCatalog from '../../../pages/pageCatalog/index.vue'
+import pageList from '../../../pages/pageList/index.vue'
+import defaultPage from '../../../pages/defaultPage.vue'
+const routes = [
+  {
+    path: '/',
+    component: defaultPage,
+    children: [
+      {
+        path: '',
+        name: 'home',
+        component: pageList,
+      },
+      {
+        path: 'catalog',
+        name: 'catalog',
+        component: pageCatalog,
+      }
+    ]
+  }
+]
 
-// // const routes = [
-// //     {
-// //         path: '/',
-// //         name: 'home',
-// //         component:listPage,
-// //     },
-// //     {
-// //         path: '/catalog',
-// //         name: 'catalog',
-// //         component:catalogPage,
-// //     },
-// // ]
+const router = createRouter({
+    history: createWebHistory(),
+    routes
+})
 
-// const router = createRouter({
-//     history: createWebHistory(),
-//     routes
-// })
-
-// export default router
+export default router

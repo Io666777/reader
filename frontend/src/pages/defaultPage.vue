@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import sidebar from '../widgets/sidebar.vue';
-import baseInput from '../shared/ui/baseInput.vue';
-import bookCatalog from '../widgets/bookCatalog.vue';
+import sidebar from '../widgets/sidebar.vue'
+import baseInput from '../shared/ui/baseInput.vue'
+import filterButton from '../shared/ui/filterButton.vue'
 </script>
 
 <template>
@@ -14,12 +14,12 @@ import bookCatalog from '../widgets/bookCatalog.vue';
           <baseInput />
         </div>
         <div class="header__actions">
-          <button class="filter-btn">Фильтры</button>
+          <filterButton />
         </div>
       </header>
 
       <main class="main-content">
-        <bookCatalog/>
+        <router-view />
       </main>
     </div>
   </div>
@@ -36,7 +36,7 @@ $bg-color: #f8f9fa
 
   &__container
     flex: 1
-    margin-left: $sidebar-width // Отступ под ширину вынесенного сайдбара
+    margin-left: $sidebar-width
     display: flex
     flex-direction: column
 
@@ -55,6 +55,11 @@ $bg-color: #f8f9fa
     &__search
       flex: 1
       max-width: 500px
+
+    &__actions
+      display: flex
+      align-items: center
+      gap: 12px
 
   .main-content
     padding: 20px 40px
