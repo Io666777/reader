@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import bookCard from '../entities/book/ui/bookCard.vue';
+import bookCard from '../entities/book/ui/catalogBookCard.vue';
 </script>
 
 <template>

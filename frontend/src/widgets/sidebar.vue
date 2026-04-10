@@ -6,14 +6,14 @@
     </div>
 
     <nav class="sidebar__nav">
-      <a href="#" class="nav-item active">
+      <router-link to="/" class="nav-item" active-class="active">
         <span class="nav-item__icon">🏠</span>
         Моя полка
-      </a>
-      <a href="#" class="nav-item">
+      </router-link>
+      <router-link to="/catalog" class="nav-item" active-class="active">
         <span class="nav-item__icon">🔍</span>
         Поиск книг
-      </a>
+      </router-link>
       <a href="#" class="nav-item">
         <span class="nav-item__icon">📑</span>
         Закладки
