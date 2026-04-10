@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import sidebar from '../widgets/sidebar.vue';
 import baseInput from '../shared/ui/baseInput.vue';
+import bookCatalog from '../widgets/bookCatalog.vue';
 </script>
 
 <template>
@@ -17,7 +18,9 @@ import baseInput from '../shared/ui/baseInput.vue';
         </div>
       </header>
 
-      <main class="main-content"></main>
+      <main class="main-content">
+        <bookCatalog/>
+      </main>
     </div>
   </div>
 </template>
