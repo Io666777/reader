@@ -1,8 +1,16 @@
+<script setup lang="ts">
+import type { BookDisplayData } from '../types';
+
+defineProps<{
+book: BookDisplayData
+}>()
+</script>
+
 <template>
   <article class="book-card" role="button" tabindex="0">
     <div class="book-card__image-container">
       <img
-        src="https://via.placeholder.com/200x300"
+        :src="book.image"
         alt="Название книги"
         class="book-card__img"
       />
@@ -13,9 +21,9 @@
     </div>
 
     <div class="book-card__content">
-      <h3 class="book-card__title">Название книги</h3>
-      <p class="book-card__author">Имя Автора</p>
-      <span class="book-card__year">2024</span>
+      <h3 class="book-card__title">{{ book.bookName }}</h3>
+      <p class="book-card__author">{{ book.author?.name }}</p>
+      <span class="book-card__year">{{ book.realiseYear }}</span>
     </div>
   </article>
 </template>

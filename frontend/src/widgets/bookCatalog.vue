@@ -1,17 +1,14 @@
 <script setup lang="ts">
 import bookCard from '../entities/book/ui/catalogBookCard.vue';
+import type { BookDisplayData } from '../entities/book/types';
+
+const books: BookDisplayData[]=([])
 </script>
 
 <template>
   <div class="books-grid">
-    <bookCard />
-    <bookCard />
-    <bookCard />
-    <bookCard />
-    <bookCard />
-    <bookCard />
-    <bookCard />
-  
+    <bookCard v-for="item in books" :key="item.id" :book="item" />
+
   </div>
 </template>
 
