@@ -1,14 +1,26 @@
 <script setup lang="ts">
-import bookCard from '../entities/book/ui/catalogBookCard.vue';
+import { ref, onMounted } from 'vue';  
+import BookCard from '../entities/book/ui/catalogBookCard.vue';
 import type { BookDisplayData } from '../entities/book/types';
+import { getBooks } from '../entities/book/api/get-book';
 
-const books: BookDisplayData[]=([])
+const books = ref<BookDisplayData[]>([]);
+
+const loadBooks = async () => {
+  try {
+    const data = await getBooks();
+    books.value = data;
+  } catch (error) {
+    console.error('Ошибка загрузки книг:', error);
+  }
+};
+
+onMounted(loadBooks);
 </script>
 
 <template>
   <div class="books-grid">
-    <bookCard v-for="item in books" :key="item.id" :book="item" />
-
+    <BookCard v-for="item in books" :key="item.id" :book="item" />
   </div>
 </template>
 
