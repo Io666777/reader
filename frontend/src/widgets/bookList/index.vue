@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';  
-import BookCard from '../entities/book/ui/catalogBookCard.vue';
-import type { BookDisplayData } from '../entities/book/types';
-import { getBooks } from '../entities/book/api/get-book';
+import { ref, onMounted } from 'vue';
+import BookCard from '../../entities/book/ui/catalogBookCard.vue';
+import type { BookDisplayData } from '../../entities/book/types';
+import { getBooks } from './api/get-book';
 
 const books = ref<BookDisplayData[]>([]);
 

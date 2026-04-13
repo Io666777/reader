@@ -1,3 +1,17 @@
+<script setup lang="ts">
+
+defineProps<{
+  modelValue: string;
+}>();
+
+const emit = defineEmits(['update:modelValue'])
+
+const onInput = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  emit('update:modelValue', target.value);
+};
+</script>
+
 <template>
   <div class="base-input">
     <div class="base-input__wrapper">
@@ -19,6 +33,8 @@
 
       <input
         type="text"
+        :value="modelValue"
+        @input="onInput"
         class="base-input__field"
         placeholder="Поиск книг..."
       />

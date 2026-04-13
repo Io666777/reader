@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import sidebar from '../widgets/sidebar.vue'
-import baseInput from '../shared/ui/baseInput.vue'
-import filterButton from '../shared/ui/filterButton.vue'
+import sidebar from '../widgets/sidebar.vue';
 </script>
 
 <template>
@@ -9,15 +7,6 @@ import filterButton from '../shared/ui/filterButton.vue'
     <sidebar />
 
     <div class="layout__container">
-      <header class="header">
-        <div class="header__search">
-          <baseInput />
-        </div>
-        <div class="header__actions">
-          <filterButton />
-        </div>
-      </header>
-
       <main class="main-content">
         <router-view />
       </main>
