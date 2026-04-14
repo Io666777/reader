@@ -18,7 +18,7 @@ export const searchExternal = async (c: Context) => {
     const data = await response.json();
 
     const results = data.docs.map((doc: any) => ({
-      isbn: doc.isbn?.[0] || doc.edition_key?.[0] || 'no-id',
+      id: (doc.isbn?.[0] || doc.edition_key?.[0] || doc.key?.replace('/works/', '') || 'no-id').trim(),
       title: doc.title,
       author: doc.author_name?.[0] || 'Неизвестный автор',
       year: doc.first_publish_year || '—',

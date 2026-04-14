@@ -7,7 +7,7 @@ defineProps<{
 </script>
 
 <template>
-  <router-link :to="'/book/' + (book.isbn || book.id)" tag="article">
+  <router-link :to="`/book/${book.id}`">
     <article class="book-card" role="button" tabindex="0">
       <div class="book-card__image-container">
         <img
