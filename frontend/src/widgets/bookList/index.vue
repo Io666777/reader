@@ -3,8 +3,10 @@ import { ref, onMounted } from 'vue';
 import BookCard from '../../entities/book/ui/catalogBookCard.vue';
 import type { BookDisplayData } from '../../entities/book/types';
 import { getBooks } from './api/get-book';
+import baseInput from '../../shared/ui/baseInput.vue';
 
 const books = ref<BookDisplayData[]>([]);
+const searchQuery = ref('');
 
 const loadBooks = async () => {
   try {
@@ -19,6 +21,7 @@ onMounted(loadBooks);
 </script>
 
 <template>
+  <baseInput v-model="searchQuery"/>
   <div class="books-grid">
     <BookCard v-for="item in books" :key="item.id" :book="item" />
   </div>

@@ -7,37 +7,37 @@ defineProps<{
 </script>
 
 <template>
-  <article class="book-card" role="button" tabindex="0">
-    <div class="book-card__image-container">
-      <img
-        v-if="book.cover || book.image"
-        :src="book.cover || book.image"
-        class="book-card__image"
-      />
+  <router-link :to="'/book/' + (book.isbn || book.id)" tag="article">
+    <article class="book-card" role="button" tabindex="0">
+      <div class="book-card__image-container">
+        <img
+          v-if="book.cover || book.image"
+          :src="book.cover || book.image"
+          class="book-card__image"
+        />
 
-      <div class="book-card__hover-overlay">
-        <span class="book-card__add-icon">+</span>
+        <div class="book-card__hover-overlay"></div>
       </div>
-    </div>
 
-    <div class="book-card__content">
-      <h3 class="book-card__title">
-        {{ book.title || book.bookName || 'Без названия' }}
-      </h3>
+      <div class="book-card__content">
+        <h3 class="book-card__title">
+          {{ book.title || book.bookName || 'Без названия' }}
+        </h3>
 
-      <p class="book-card__author">
-        {{
-          typeof book.author === 'string'
-            ? book.author
-            : book.author?.name || 'Автор неизвестен'
-        }}
-      </p>
+        <p class="book-card__author">
+          {{
+            typeof book.author === 'string'
+              ? book.author
+              : book.author?.name || 'Автор неизвестен'
+          }}
+        </p>
 
-      <span class="book-card__year">{{
-        book.realiseYear || book.year || 'Год неизв.'
-      }}</span>
-    </div>
-  </article>
+        <span class="book-card__year">{{
+          book.realiseYear || book.year || 'Год неизв.'
+        }}</span>
+      </div>
+    </article>
+  </router-link>
 </template>
 
 <style scoped lang="sass">
@@ -93,18 +93,7 @@ defineProps<{
     opacity: 0
     transition: opacity 0.2s ease
 
-  &__add-icon
-    width: 40px
-    height: 40px
-    background: #2196f3
-    color: white
-    border-radius: 50%
-    display: flex
-    align-items: center
-    justify-content: center
-    font-size: 24px
-    font-weight: bold
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2)
+
 
   &__content
     padding: 12px 4px 0 4px

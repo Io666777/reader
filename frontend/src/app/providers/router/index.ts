@@ -16,6 +16,11 @@ const routes = [
         path: 'catalog',
         name: 'catalog',
         component: pageCatalog,
+      },
+      {
+        path: '/book/:id',
+        name: 'bookDetals',
+        component: ()=> import('../../..//pages/bookDetalsPage/index.vue')
       }
     ]
   }

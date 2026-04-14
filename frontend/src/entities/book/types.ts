@@ -16,6 +16,7 @@ export interface Author {
 
 // entities/book/types.ts
 export interface BookDisplayData {
+  isbn: string;
   year: string | undefined;
   id?: number | string;   // Для внешних книг ID может быть строкой (ISBN)
   bookName?: string;      // Поле из твоей БД
