@@ -2,17 +2,17 @@
 import type { BookDisplayData } from '../types';
 
 defineProps<{
-book: BookDisplayData
-}>()
+  book: BookDisplayData;
+}>();
 </script>
 
 <template>
   <article class="book-card" role="button" tabindex="0">
     <div class="book-card__image-container">
       <img
-        :src="book.image"
-        alt="Название книги"
-        class="book-card__img"
+        v-if="book.cover || book.image"
+        :src="book.cover || book.image"
+        class="book-card__image"
       />
 
       <div class="book-card__hover-overlay">
@@ -21,9 +21,21 @@ book: BookDisplayData
     </div>
 
     <div class="book-card__content">
-      <h3 class="book-card__title">{{ book.bookName }}</h3>
-      <p class="book-card__author">{{ book.author?.name }}</p>
-      <span class="book-card__year">{{ book.realiseYear }}</span>
+      <h3 class="book-card__title">
+        {{ book.title || book.bookName || 'Без названия' }}
+      </h3>
+
+      <p class="book-card__author">
+        {{
+          typeof book.author === 'string'
+            ? book.author
+            : book.author?.name || 'Автор неизвестен'
+        }}
+      </p>
+
+      <span class="book-card__year">{{
+        book.realiseYear || book.year || 'Год неизв.'
+      }}</span>
     </div>
   </article>
 </template>
@@ -48,7 +60,7 @@ book: BookDisplayData
 
     .book-card__image-container
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15)
-    
+
     .book-card__hover-overlay
       opacity: 1
 

@@ -14,6 +14,14 @@ export interface Author {
   createdAt: string;
 }
 
-export interface BookDisplayData extends Book {
-  author?: Author;  
+// entities/book/types.ts
+export interface BookDisplayData {
+  year: string | undefined;
+  id?: number | string;   // Для внешних книг ID может быть строкой (ISBN)
+  bookName?: string;      // Поле из твоей БД
+  title?: string;         // Поле из внешнего поиска
+  image?: string;         // Поле из твоей БД
+  cover?: string | null;  // Поле из внешнего поиска (добавляем сюда)
+  realiseYear?: string;
+  author: string | { name: string }; // Может быть строкой от API или объектом из БД
 }
