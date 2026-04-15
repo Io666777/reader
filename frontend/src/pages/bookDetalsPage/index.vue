@@ -24,6 +24,7 @@ onMounted(() => {
     <main class="book-details__content">
       <div class="info-card">
         <p><strong>ID книги:</strong> {{ bookId }}</p>
+        <p>{{ }}</p>
         
         <div v-if="bookId === 'no-id'" class="warning">
           У этой книги отсутствует ISBN. Скорее всего, это редкое издание или ошибка в Open Library.
