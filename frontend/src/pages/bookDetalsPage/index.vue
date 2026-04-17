@@ -1,41 +1,31 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
 import { onMounted, ref } from 'vue';
+import type { Detals } from './types';
+import { getDetals } from './api/get-detals';
 
 const route = useRoute();
-const bookId = route.params.id; // Получаем ID из URL
+const bookId = route.params.id as string; // Получаем ID из URL
 
-// Состояние для данных книги (пока пустое)
-const bookData = ref(null);
+const book = ref<Detals | null>(null)
+const isLoading = ref(true)
 
-onMounted(() => {
-  console.log('Загружаем данные для книги с ID:', bookId);
-  // Здесь будет fetch запрос к твоему API
-});
+onMounted(async()=>{
+  try{
+    book.value = await getDetals(bookId);
+  }catch(error){
+    console.error("Не удалось загрузить детали:", error);
+  }finally{
+    isLoading.value=false
+  }
+})
 </script>
 
 <template>
-  <div class="book-details">
-    <header class="book-details__header">
-      <button @click="$router.back()" class="back-btn">← Назад</button>
-      <h1>Страница книги</h1>
-    </header>
-
-    <main class="book-details__content">
-      <div class="info-card">
-        <p><strong>ID книги:</strong> {{ bookId }}</p>
-        <p>{{ }}</p>
-        
-        <div v-if="bookId === 'no-id'" class="warning">
-          У этой книги отсутствует ISBN. Скорее всего, это редкое издание или ошибка в Open Library.
-        </div>
-        
-        <p v-else>
-          Тут мы скоро выведем полное описание, обложку и отзывы для книги.
-        </p>
-      </div>
-    </main>
-  </div>
+  <h1>{{ book?.title }}</h1>
+  <p>{{ book?.description }}</p>
+  <p>{{ book?.image}}</p>
+  <p>{{ book?.reliseYear}}</p>
 </template>
 
 <style scoped lang="sass">
