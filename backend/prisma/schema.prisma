@@ -15,6 +15,7 @@ model Book {
   authorId    String
   author      Author     @relation(fields: [authorId], references: [id])
   createdAt   DateTime   @default(now())
+  description String?
   userBooks   UserBook[]
 }
 

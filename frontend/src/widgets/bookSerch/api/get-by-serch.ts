@@ -6,7 +6,7 @@ export async function getBySerch(query: string): Promise<BookDisplayData[]> {
   if (!query) return [];
 
   // ВАЖНО: твой бэкенд в методе searchExternal ждет параметр 'title'
-  const response = await fetch(`http://localhost:3000/book/search?title=${encodeURIComponent(query)}`);
+  const response = await fetch(`http://localhost:3000/api/books/search?title=${encodeURIComponent(query)}`);
   
   if (!response.ok) throw new Error('Ошибка глобального поиска');
 

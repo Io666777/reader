@@ -3,18 +3,29 @@ import prisma from "../../../lib/prisma"; // Используй свой гот�
 
 export const getBookById = async (c: Context) => {
   const id = c.req.param('id');
+  console.log('Запрос пришел! Ищем ID:', id);
   
   try {
-     const book = await prisma.book.findUnique({
+ 
+    const book = await prisma.book.findUnique({
       where: { id: id },
       include: { author: true }
     });
 
     if (book) {
-      return c.json(book);
+      console.log('Ура! Книга найдена в БД:', book.bookName);
+      return c.json({
+        id: book.id,
+        title: book.bookName,
+        description: book.description,
+        image: book.image,
+        reliseYear: book.realiseYear ? Number(book.realiseYear) : 0,
+        isExternal: false
+        
+      });
     }
- 
-    const response = await fetch(`https://openlibrary.org/works/${id}.json`);
+    console.log('В БД пусто. Пошел в Open Library...');
+    const response = await fetch(`https://openlibrary.org/books/${id}.json`)
  
     if (!response.ok) {
       return c.json({ error: 'Книга не найдена ни в базе, ни в Open Library' }, 404);
@@ -31,7 +42,7 @@ export const getBookById = async (c: Context) => {
       image: externalData.covers
         ? `https://covers.openlibrary.org/b/id/${externalData.covers[0]}-L.jpg`
         : null,
-      realiseYear: externalData.first_publish_year || "-", // Исправил опечатку realise
+      realiseYear: externalData.first_publish_year || "-", 
       isExternal: true
     };
  

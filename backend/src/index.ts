@@ -9,7 +9,7 @@ const app = new Hono()
 
 app.use('*', cors())
 app.use('*', trimTrailingSlash())
-app.route('/book', bookRoute)
+app.route('/api/books', bookRoute)
 
 
 app.get('/', (c) => {
