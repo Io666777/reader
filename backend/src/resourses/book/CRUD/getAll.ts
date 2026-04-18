@@ -15,11 +15,22 @@ export const getAll = async (c: Context) => {
         ]
       } : {},
       include: {
-        author: true // Важно! Чтобы на фронте отобразилось имя автора
+        author: true,
+        genres: true
       }
     });
 
-    return c.json(books);
+    const mappedBooks = books.map(book=>({
+      id: book.id,
+      bookName: book.bookName,
+      author: book.author.name,
+      image: book.image,
+      realiseYear: book.realiseYear,
+      rating: book.rating,
+      genres: book.genres.map(g=>g.name),
+      isbn: book.isbn
+    }))
+    return c.json(mappedBooks);
   } catch (error) {
     console.error('Error fetching books:', error);
     return c.json({ error: 'Не удалось получить список книг' }, 500);

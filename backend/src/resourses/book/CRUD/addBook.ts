@@ -13,7 +13,6 @@ export const addBook = async (c: Context) => {
         realiseYear: String(body.year),
         author: {
           connectOrCreate: {
-            // Теперь ищем по ИМЕНИ, а не по ID
             where: { name: body.author }, 
             create: { name: body.author }
           }

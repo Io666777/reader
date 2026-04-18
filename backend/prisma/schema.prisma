@@ -16,7 +16,7 @@ model Book {
   author      Author   @relation(fields: [authorId], references: [id])
   createdAt   DateTime @default(now())
   description String?
-  reting      Float?   @default(0)
+  rating      Float?   @default(0)
 
   genres    Genre[]
   userBooks UserBook[]

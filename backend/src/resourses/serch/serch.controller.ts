@@ -22,7 +22,10 @@ export const searchExternal = async (c: Context) => {
       title: doc.title,
       author: doc.author_name?.[0] || 'Неизвестный автор',
       year: doc.first_publish_year || '—',
-      cover: doc.cover_i ? `https://covers.openlibrary.org/b/id/${doc.cover_i}-M.jpg` : null
+      cover: doc.cover_i ? `https://covers.openlibrary.org/b/id/${doc.cover_i}-M.jpg` : null,
+      genres: doc.subject ? doc.subject.slice(0, 3): [],
+      rating: doc.ratings_average ? Number(doc.ratings_average.toFixed(1)) : 0,
+      isExternal: true
     }));
 
     return c.json(results);
