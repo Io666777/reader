@@ -1,65 +1,167 @@
 <script setup lang="ts">
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { onMounted, ref } from 'vue';
 import type { Detals } from './types';
 import { getDetals } from './api/get-detals';
 
 const route = useRoute();
-const bookId = route.params.id as string; // Получаем ID из URL
+const router = useRouter();
+const bookId = route.params.id as string;
 
 const book = ref<Detals | null>(null)
 const isLoading = ref(true)
 
-onMounted(async()=>{
-  try{
+onMounted(async () => {
+  try {
     book.value = await getDetals(bookId);
-  }catch(error){
+  } catch (error) {
     console.error("Не удалось загрузить детали:", error);
-  }finally{
-    isLoading.value=false
+  } finally {
+    isLoading.value = false
   }
 })
+
+const goBack = () => router.back();
 </script>
 
 <template>
-  <h1>{{ book?.title }}</h1>
-  <p>{{ book?.description }}</p>
-  <p>{{ book?.image}}</p>
-  <p>{{ book?.reliseYear}}</p>
+  <div class="book-details">
+    <header class="book-details__header">
+      <button class="back-btn" @click="goBack">← Назад</button>
+    </header>
+
+    <div v-if="isLoading" class="loading">
+      Загрузка данных о книге...
+    </div>
+
+    <div v-else-if="book" class="info-card">
+      <div class="info-card__content">
+        
+        <div class="info-card__image-container">
+          <img 
+            v-if="book.image" 
+            :src="book.image" 
+            :alt="book.title" 
+            class="book-image"
+          />
+          <div v-else class="image-placeholder">Нет обложки</div>
+        </div>
+
+        <div class="info-card__text-container">
+          <h1 class="title">{{ book.title }}</h1>
+          <p class="year">Год издания: <strong>{{ book.reliseYear || 'Неизвестно' }}</strong></p>
+          
+          <div class="description-section">
+            <h3>Описание</h3>
+            <p class="description-text">{{ book.description }}</p>
+          </div>
+
+          <div v-if="book.isExternal" class="warning">
+            ⚠️ Эта книга найдена в глобальной библиотеке. Вы можете добавить её в свою коллекцию.
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div v-else class="error-state">
+      Книга не найдена. Возможно, ID неверный.
+    </div>
+  </div>
 </template>
 
 <style scoped lang="sass">
 .book-details
   padding: 20px
-  max-width: 800px
+  max-width: 900px
   margin: 0 auto
+  font-family: sans-serif
 
   &__header
-    display: flex
-    align-items: center
-    gap: 20px
-    margin-bottom: 30px
+    margin-bottom: 20px
 
   .back-btn
-    background: none
-    border: 1px solid #ccc
+    background: #f8f9fa
+    border: 1px solid #dee2e6
     padding: 8px 16px
     border-radius: 8px
     cursor: pointer
+    transition: all 0.2s
     &:hover
-      background: #f0f0f0
+      background: #e2e6ea
 
   .info-card
     background: #fff
-    padding: 24px
-    border-radius: 12px
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05)
+    padding: 30px
+    border-radius: 16px
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08)
+
+    &__content
+      display: flex
+      gap: 40px // Расстояние между картинкой и текстом
+      align-items: flex-start
+
+      // Адаптив для мобилок (в одну колонку)
+      @media (max-width: 600px)
+        flex-direction: column
+        align-items: center
+
+  .info-card__image-container
+    flex-shrink: 0 // Чтобы картинка не сжималась
+    width: 250px
+
+    .book-image
+      width: 100%
+      height: auto
+      border-radius: 8px
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1)
+
+    .image-placeholder
+      width: 100%
+      height: 350px
+      background: #eee
+      display: flex
+      align-items: center
+      justify-content: center
+      border-radius: 8px
+      color: #888
+
+  .info-card__text-container
+    flex-grow: 1
+
+    .title
+      margin: 0 0 10px 0
+      font-size: 2rem
+      color: #2c3e50
+
+    .year
+      color: #666
+      margin-bottom: 20px
+
+    .description-section
+      margin-top: 20px
+      
+      h3
+        margin-bottom: 8px
+        border-bottom: 1px solid #eee
+        padding-bottom: 4px
+
+      .description-text
+        line-height: 1.6
+        color: #444
+        white-space: pre-line // Сохраняет переносы строк из базы
 
   .warning
-    margin-top: 15px
-    padding: 12px
+    margin-top: 25px
+    padding: 12px 16px
     background: #fff3cd
     color: #856404
-    border-radius: 6px
+    border-radius: 8px
     border: 1px solid #ffeeba
+    font-size: 0.9rem
+
+  .loading, .error-state
+    text-align: center
+    padding: 50px
+    color: #666
 </style>

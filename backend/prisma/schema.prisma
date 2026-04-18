@@ -7,16 +7,26 @@ datasource db {
 }
 
 model Book {
-  id          String     @id @default(uuid())
-  isbn        String     @unique
+  id          String   @id @default(uuid())
+  isbn        String   @unique
   bookName    String?
   image       String?
   realiseYear String?
   authorId    String
-  author      Author     @relation(fields: [authorId], references: [id])
-  createdAt   DateTime   @default(now())
+  author      Author   @relation(fields: [authorId], references: [id])
+  createdAt   DateTime @default(now())
   description String?
-  userBooks   UserBook[]
+  reting      Float?   @default(0)
+
+  genres    Genre[]
+  userBooks UserBook[]
+}
+
+model Genre {
+  id   String @id @default(uuid())
+  name String @unique
+
+  books Book[]
 }
 
 model Author {

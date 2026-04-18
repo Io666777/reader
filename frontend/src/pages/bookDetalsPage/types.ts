@@ -4,4 +4,5 @@ export interface Detals{
     description: string
     image: string
     reliseYear: number
+    isExternal: boolean
 }
