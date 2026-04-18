@@ -26,8 +26,11 @@ const getAuthorName = (author: any) => {
           <span>Нет обложки</span>
         </div>
 
-        <div v-if="book.rating" class="book-card__rating-badge">
-          ⭐ {{ book.rating.toFixed(1) }}
+        <div
+          v-if="book.rating !== null && book.rating !== undefined"
+          class="book-card__rating-badge"
+        >
+          ⭐ {{ book.rating > 0 ? book.rating.toFixed(1) : '0' }}
         </div>
 
         <div class="book-card__hover-overlay">
@@ -44,8 +47,8 @@ const getAuthorName = (author: any) => {
           {{ getAuthorName(book.author) }}
         </p>
 
-        <div v-if="book.genres && book.genres.length" class="book-card__genres">
-          {{ book.genres.join(', ') }}
+        <div  class="book-card__genres">
+          {{ book.genres }}
         </div>
 
         <div class="book-card__footer">

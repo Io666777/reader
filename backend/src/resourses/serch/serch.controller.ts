@@ -10,7 +10,7 @@ export const searchExternal = async (c: Context) => {
 
   try {
     // Формируем запрос: можно искать по title, по author или по обоим
-    let url = `https://openlibrary.org/search.json?limit=20`;
+    let url = `https://openlibrary.org/search.json?limit=5`;
     if (title) url += `&title=${encodeURIComponent(title)}`;
     if (author) url += `&author=${encodeURIComponent(author)}`;
 

@@ -43,7 +43,7 @@ export const getBookById = async (c: Context) => {
         : null,
       realiseYear: externalData.first_publish_year || "-", 
       rating: externalData.ratings_average || 0,
-      genres: externalData.subjects ? externalData.subjects.slice(0, 5) : [],
+      genres: externalData.subjects || externalData.subject || [],
       isExternal: true
     };
  

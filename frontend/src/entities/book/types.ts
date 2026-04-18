@@ -7,7 +7,8 @@ export interface Book {
   isbn: string;
   createdAt: string;
   genres: string[]
-  reting: number
+  rating: number
+  isExternal: boolean;
 }
 
 export interface Author {
