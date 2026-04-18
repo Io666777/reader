@@ -6,6 +6,8 @@ export interface Book {
   image: string;
   isbn: string;
   createdAt: string;
+  genres: string[]
+  reting: number
 }
 
 export interface Author {
@@ -24,5 +26,7 @@ export interface BookDisplayData {
   image?: string;         // Поле из твоей БД
   cover?: string | null;  // Поле из внешнего поиска (добавляем сюда)
   realiseYear?: string;
-  author: string | { name: string }; // Может быть строкой от API или объектом из БД
+  author: string | { name: string }
+  rating?: number
+  genres?: string[]
 }

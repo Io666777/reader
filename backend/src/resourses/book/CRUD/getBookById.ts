@@ -9,7 +9,7 @@ export const getBookById = async (c: Context) => {
  
     const book = await prisma.book.findUnique({
       where: { id: id },
-      include: { author: true }
+      include: { author: true, genres: true }
     });
 
     if (book) {
@@ -20,6 +20,8 @@ export const getBookById = async (c: Context) => {
         description: book.description,
         image: book.image,
         reliseYear: book.realiseYear ? Number(book.realiseYear) : 0,
+        reting: book.reting,
+        genres: book.genres.map(g=> g.name),
         isExternal: false
         
       });
