@@ -105,6 +105,7 @@ const goBack = () => router.back();
     border-radius: 16px
     min-height: 500px
     box-shadow: 0 10px 25px rgba(0,0,0,0.08)
+    overflow: hidden
 
     &__content
       display: flex
@@ -150,6 +151,7 @@ const goBack = () => router.back();
 
   .info-card__text-container
     flex-grow: 1
+    min-width: 0
 
     .genres-row
       margin-bottom: 15px

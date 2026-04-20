@@ -1,27 +1,51 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref, onMounted, onUnmounted } from 'vue';
 
 const props = defineProps<{
   genres: string[];
 }>();
 
+const isOpen = ref(false);
+const containerRef = ref<HTMLElement | null>(null);
+
 const firstGenre = computed(() => props.genres?.[0] || 'Без жанра');
 const otherGenres = computed(() => props.genres?.slice(1) || []);
 
-// Оставляем твою логику цвета (пример упрощен)
+const toggleTooltip = () => {
+  if (otherGenres.value.length > 0) {
+    isOpen.value = !isOpen.value;
+  }
+};
+
+const handleClickOutside = (event: MouseEvent) => {
+  if (
+    containerRef.value &&
+    !containerRef.value.contains(event.target as Node)
+  ) {
+    isOpen.value = false;
+  }
+};
+
+onMounted(() => document.addEventListener('click', handleClickOutside));
+onUnmounted(() => document.removeEventListener('click', handleClickOutside));
+
 const badgeStyle = computed(() => ({
-  backgroundColor: props.genres?.length > 1 ? 'hsl(45, 90%, 70%)' : 'hsl(45, 90%, 90%)'
+  backgroundColor:
+    props.genres?.length > 1 ? 'hsl(45, 90%, 70%)' : 'hsl(45, 90%, 90%)',
+  cursor: otherGenres.value.length > 0 ? 'pointer' : 'default',
 }));
 </script>
 
 <template>
-  <div class="genre-container">
-    <span class="genre-badge" :style="badgeStyle">
+  <div class="genre-container" ref="containerRef">
+    <span class="genre-badge" :style="badgeStyle" @click.stop="toggleTooltip">
       {{ firstGenre }}
-      <span v-if="otherGenres.length" class="plus-count">+{{ otherGenres.length }}</span>
+      <span v-if="otherGenres.length" class="plus-count"
+        >+{{ otherGenres.length }}</span
+      >
     </span>
 
-    <div v-if="otherGenres.length" class="genre-tooltip">
+    <div v-if="isOpen && otherGenres.length" class="genre-tooltip">
       <div class="tooltip-title">Все жанры:</div>
       <ul class="tooltip-list">
         <li v-for="g in genres" :key="g">{{ g }}</li>
@@ -34,7 +58,6 @@ const badgeStyle = computed(() => ({
 .genre-container
   position: relative
   display: inline-block
-  cursor: help
 
   &:hover .genre-tooltip
     display: block
@@ -49,7 +72,7 @@ const badgeStyle = computed(() => ({
   color: #333
 
 .genre-tooltip
-  display: none
+  display: block
   position: absolute
   top: 125% // Переместили вниз (было bottom: 125%)
   left: 50%
@@ -65,17 +88,11 @@ const badgeStyle = computed(() => ({
   opacity: 0
   transition: all 0.2s ease
   border: 1px solid #eee // Добавили легкую рамку, так как фон белый
+  max-height: 200px
+  overflow-y: auto
 
   // Треугольник (стрелочка) теперь сверху
-  &::after
-    content: ''
-    position: absolute
-    bottom: 100% // Переместили на верхнюю грань окна
-    left: 50%
-    margin-left: -5px
-    border-width: 5px
-    border-style: solid
-    border-color: transparent transparent #ffffff transparent // Развернули стрелку вниз
+
 
 .tooltip-title
   font-size: 11px
