@@ -1,5 +1,5 @@
 import type { Context } from "hono";
-import prisma from "../../../lib/prisma"; // Используй свой готовый инстанс prisma
+import prisma from "../../lib/prisma"; // Используй свой готовый инстанс prisma
 
 export const getBookById = async (c: Context) => {
   const id = c.req.param('id');

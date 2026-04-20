@@ -5,4 +5,5 @@ export interface Detals{
     image: string
     reliseYear: number
     isExternal: boolean
+    genres: string[]
 }

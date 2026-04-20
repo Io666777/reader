@@ -1,10 +1,10 @@
 import { Hono } from "hono";
-import { addBook } from "./CRUD/addBook"
-import { deleteBook } from "./CRUD/deleteBook"
-import { getAll } from "./CRUD/getAll"
+import { addBook } from "./book/addBook"
+import { deleteBook } from "./book/deleteBook"
+import { getAll } from "./book/getAll"
 
-import * as serch from "../serch/serch.controller"
-import { getBookById } from "./CRUD/getBookById";
+import * as serch from "./serch/serch.controller"
+import { getBookById } from "./book/getBookById";
 
 const bookRoute = new Hono();
 bookRoute.get('/', getAll);

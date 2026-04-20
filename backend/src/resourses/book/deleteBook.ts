@@ -1,5 +1,5 @@
 import type { Context } from "hono";
-import prisma from "../../../lib/prisma";
+import prisma from "../../lib/prisma";
 
 
 export const deleteBook = async(c:Context)=>{

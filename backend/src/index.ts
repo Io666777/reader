@@ -2,7 +2,7 @@ import "dotenv/config";
 import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
 import{ cors } from 'hono/cors'
-import bookRoute from './resourses/book/route'
+import bookRoute from './resourses/route'
 import { trimTrailingSlash } from "hono/trailing-slash";
 
 const app = new Hono()

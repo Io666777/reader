@@ -1,14 +1,33 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import baseInput from '../../shared/ui/baseInput.vue';
 import BookCard from '../../entities/book/ui/catalogBookCard.vue';
 import { getBySerch } from './api/get-by-serch';
 import type { BookDisplayData } from '../../entities/book/types';
 
+const route = useRoute();
+const router = useRouter();
 const books = ref<BookDisplayData[]>([]);
 const searchQuery = ref('');
 
+onMounted(async () => {
+  const queryFromUrl = route.query.q as string;
+  if (queryFromUrl) {
+    searchQuery.value = queryFromUrl;
+    // Сразу загружаем данные, чтобы пользователь не видел пустой экран
+    books.value = await getBySerch(queryFromUrl);
+  }
+});
+
 const handleSearch = async () => {
+  const trimmedQuery = searchQuery.value.trim();
+
+  // Обновляем URL (делаем q=текст), чтобы браузер запомнил состояние
+  router.replace({
+    query: { ...route.query, q: trimmedQuery || undefined },
+  });
+
   if (!searchQuery.value.trim()) {
     books.value = [];
     return;

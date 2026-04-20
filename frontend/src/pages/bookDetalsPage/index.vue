@@ -3,23 +3,24 @@ import { useRoute, useRouter } from 'vue-router';
 import { onMounted, ref } from 'vue';
 import type { Detals } from './types';
 import { getDetals } from './api/get-detals';
+import GenreBar from '../../shared/ui/genreBar.vue';
 
 const route = useRoute();
 const router = useRouter();
 const bookId = route.params.id as string;
 
-const book = ref<Detals | null>(null)
-const isLoading = ref(true)
+const book = ref<Detals | null>(null);
+const isLoading = ref(true);
 
 onMounted(async () => {
   try {
     book.value = await getDetals(bookId);
   } catch (error) {
-    console.error("Не удалось загрузить детали:", error);
+    console.error('Не удалось загрузить детали:', error);
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
-})
+});
 
 const goBack = () => router.back();
 </script>
@@ -30,18 +31,15 @@ const goBack = () => router.back();
       <button class="back-btn" @click="goBack">← Назад</button>
     </header>
 
-    <div v-if="isLoading" class="loading">
-      Загрузка данных о книге...
-    </div>
+    <div v-if="isLoading" class="loading">Загрузка данных о книге...</div>
 
     <div v-else-if="book" class="info-card">
       <div class="info-card__content">
-        
         <div class="info-card__image-container">
-          <img 
-            v-if="book.image" 
-            :src="book.image" 
-            :alt="book.title" 
+          <img
+            v-if="book.image"
+            :src="book.image"
+            :alt="book.title"
             class="book-image"
           />
           <div v-else class="image-placeholder">Нет обложки</div>
@@ -49,28 +47,36 @@ const goBack = () => router.back();
 
         <div class="info-card__text-container">
           <h1 class="title">{{ book.title }}</h1>
-          <p class="year">Год издания: <strong>{{ book.reliseYear || 'Неизвестно' }}</strong></p>
-          
+          <p class="year">
+            Год издания: <strong>{{ book.reliseYear || 'Неизвестно' }}</strong>
+          </p>
+
           <div class="description-section">
             <h3>Описание</h3>
             <p class="description-text">{{ book.description }}</p>
           </div>
 
           <div v-if="book.isExternal" class="warning">
-            ⚠️ Эта книга найдена в глобальной библиотеке. Вы можете добавить её в свою коллекцию.
+            ⚠️ Эта книга найдена в глобальной библиотеке. Вы можете добавить её
+            в свою коллекцию.
           </div>
         </div>
 
+        <div v-if="book.genres?.length" class="genres-section">
+          <GenreBar v-if="!isLoading && book" :genres="book.genres" />
+        </div>
       </div>
     </div>
 
     <div v-else class="error-state">
       Книга не найдена. Возможно, ID неверный.
     </div>
+    
   </div>
 </template>
 
 <style scoped lang="sass">
+
 .book-details
   padding: 20px
   max-width: 900px
@@ -140,7 +146,7 @@ const goBack = () => router.back();
 
     .description-section
       margin-top: 20px
-      
+
       h3
         margin-bottom: 8px
         border-bottom: 1px solid #eee
