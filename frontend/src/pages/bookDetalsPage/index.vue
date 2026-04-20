@@ -4,6 +4,7 @@ import { onMounted, ref } from 'vue';
 import type { Detals } from './types';
 import { getDetals } from './api/get-detals';
 import GenreBar from '../../shared/ui/genreBar.vue';
+import BaseButton from '../../shared/ui/baseButton.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -38,12 +39,12 @@ const goBack = () => router.back();
         <div class="info-card__image-container">
           <div class="image-wrapper">
             <div class="status-icon">
-              <img 
-                :src="book.isExternal ? '/star-orange.svg' : '/star-green.svg'" 
+              <img
+                :src="book.isExternal ? '/star-orange.svg' : '/star-green.svg'"
                 alt="status"
               />
             </div>
-          
+
             <img
               v-if="book.image"
               :src="book.image"
@@ -52,11 +53,17 @@ const goBack = () => router.back();
             />
             <div v-else class="image-placeholder">Нет обложки</div>
           </div>
+          <BaseButton
+            variant="add"
+            ,
+            text="добавить книгу"
+            class="add-button"
+          />
         </div>
 
         <div class="info-card__text-container">
           <h1 class="title">{{ book.title }}</h1>
-          
+
           <div v-if="book.genres?.length" class="genres-row">
             <GenreBar :genres="book.genres" />
           </div>
@@ -119,6 +126,10 @@ const goBack = () => router.back();
   .info-card__image-container
     flex-shrink: 0
     width: 250px
+    display: flex
+    flex-direction: column
+    align-items: center
+    gap: 15px
 
     .image-wrapper
       position: relative // Нужно для абсолютного позиционирования звезды
@@ -133,6 +144,11 @@ const goBack = () => router.back();
       height: 40px
       filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2))
 
+    .add-button
+      padding: 6px 12px;
+      border-radius: 12px;
+      font-size: 16px;
+      
     .book-image
       width: 100%
       height: auto
