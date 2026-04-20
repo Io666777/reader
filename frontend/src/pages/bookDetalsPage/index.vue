@@ -36,17 +36,31 @@ const goBack = () => router.back();
     <div v-else-if="book" class="info-card">
       <div class="info-card__content">
         <div class="info-card__image-container">
-          <img
-            v-if="book.image"
-            :src="book.image"
-            :alt="book.title"
-            class="book-image"
-          />
-          <div v-else class="image-placeholder">Нет обложки</div>
+          <div class="image-wrapper">
+            <div class="status-icon">
+              <img 
+                :src="book.isExternal ? '/star-orange.svg' : '/star-green.svg'" 
+                alt="status"
+              />
+            </div>
+          
+            <img
+              v-if="book.image"
+              :src="book.image"
+              :alt="book.title"
+              class="book-image"
+            />
+            <div v-else class="image-placeholder">Нет обложки</div>
+          </div>
         </div>
 
         <div class="info-card__text-container">
           <h1 class="title">{{ book.title }}</h1>
+          
+          <div v-if="book.genres?.length" class="genres-row">
+            <GenreBar :genres="book.genres" />
+          </div>
+
           <p class="year">
             Год издания: <strong>{{ book.reliseYear || 'Неизвестно' }}</strong>
           </p>
@@ -55,15 +69,6 @@ const goBack = () => router.back();
             <h3>Описание</h3>
             <p class="description-text">{{ book.description }}</p>
           </div>
-
-          <div v-if="book.isExternal" class="warning">
-            ⚠️ Эта книга найдена в глобальной библиотеке. Вы можете добавить её
-            в свою коллекцию.
-          </div>
-        </div>
-
-        <div v-if="book.genres?.length" class="genres-section">
-          <GenreBar v-if="!isLoading && book" :genres="book.genres" />
         </div>
       </div>
     </div>
@@ -71,12 +76,10 @@ const goBack = () => router.back();
     <div v-else class="error-state">
       Книга не найдена. Возможно, ID неверный.
     </div>
-    
   </div>
 </template>
 
 <style scoped lang="sass">
-
 .book-details
   padding: 20px
   max-width: 900px
@@ -100,21 +103,34 @@ const goBack = () => router.back();
     background: #fff
     padding: 30px
     border-radius: 16px
+    min-height: 500px
     box-shadow: 0 10px 25px rgba(0,0,0,0.08)
 
     &__content
       display: flex
-      gap: 40px // Расстояние между картинкой и текстом
+      gap: 40px
       align-items: flex-start
 
-      // Адаптив для мобилок (в одну колонку)
       @media (max-width: 600px)
         flex-direction: column
         align-items: center
 
   .info-card__image-container
-    flex-shrink: 0 // Чтобы картинка не сжималась
+    flex-shrink: 0
     width: 250px
+
+    .image-wrapper
+      position: relative // Нужно для абсолютного позиционирования звезды
+      width: 100%
+
+    .status-icon
+      position: absolute
+      top: -10px
+      left: -10px
+      z-index: 10
+      width: 40px
+      height: 40px
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2))
 
     .book-image
       width: 100%
@@ -135,6 +151,9 @@ const goBack = () => router.back();
   .info-card__text-container
     flex-grow: 1
 
+    .genres-row
+      margin-bottom: 15px
+
     .title
       margin: 0 0 10px 0
       font-size: 2rem
@@ -154,17 +173,13 @@ const goBack = () => router.back();
 
       .description-text
         line-height: 1.6
+        display: -webkit-box
+        -webkit-line-clamp: 15
+        -webkit-box-orient: vertical
+        overflow: hidden
+        text-overflow: ellipsis
         color: #444
-        white-space: pre-line // Сохраняет переносы строк из базы
-
-  .warning
-    margin-top: 25px
-    padding: 12px 16px
-    background: #fff3cd
-    color: #856404
-    border-radius: 8px
-    border: 1px solid #ffeeba
-    font-size: 0.9rem
+        white-space: pre-line
 
   .loading, .error-state
     text-align: center
