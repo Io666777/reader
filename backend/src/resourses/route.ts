@@ -8,7 +8,7 @@ import { getBookById } from "./book/getBookById";
 
 const bookRoute = new Hono();
 bookRoute.get('/', getAll);
-bookRoute.post('/add', addBook);
+bookRoute.post('/:id', addBook);
 bookRoute.get('/search', serch.searchExternal)
 bookRoute.get('/:id',getBookById)
 bookRoute.delete('/:id', deleteBook);

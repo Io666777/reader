@@ -18,9 +18,9 @@ const routes = [
         component: pageCatalog,
       },
       {
-        path: '/book/:id',
+        path: 'book/:id',
         name: 'bookDetals',
-        component: ()=> import('../../..//pages/bookDetalsPage/index.vue')
+        component: ()=> import('../../../pages/bookDetalsPage/index.vue')
       }
     ]
   }

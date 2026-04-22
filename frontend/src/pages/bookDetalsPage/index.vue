@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { useRoute, useRouter } from 'vue-router';
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import type { Detals } from './types';
 import { getDetals } from './api/get-detals';
+import { addBook } from './api/add-book';
+import { deleteBook } from './api/delete-book';
 import GenreBar from '../../shared/ui/genreBar.vue';
 import BaseButton from '../../shared/ui/baseButton.vue';
 
@@ -12,6 +14,11 @@ const bookId = route.params.id as string;
 
 const book = ref<Detals | null>(null);
 const isLoading = ref(true);
+const isProcessing = ref(false);
+
+const bookPage = computed(() => {
+  return route.query.from === 'home';
+});
 
 onMounted(async () => {
   try {
@@ -22,6 +29,26 @@ onMounted(async () => {
     isLoading.value = false;
   }
 });
+
+const handleAction = async () => {
+  if (!book.value || isProcessing.value) return;
+
+  isProcessing.value = true;
+  try {
+    if (bookPage.value) {
+      await deleteBook(book.value.id);
+      router.push({ name: 'home' });
+    } else {
+      await addBook(book.value);
+      book.value.isExternal = false;
+      alert('Книга добавлена!');
+    }
+  } catch (error: any) {
+    alert(error.message || 'Произошла ошибка');
+  } finally {
+    isProcessing.value = false;
+  }
+};
 
 const goBack = () => router.back();
 </script>
@@ -38,12 +65,7 @@ const goBack = () => router.back();
       <div class="info-card__content">
         <div class="info-card__image-container">
           <div class="image-wrapper">
-            <div class="status-icon">
-              <img
-                :src="book.isExternal ? '/star-orange.svg' : '/star-green.svg'"
-                alt="status"
-              />
-            </div>
+            <div class="status-icon"></div>
 
             <img
               v-if="book.image"
@@ -54,15 +76,16 @@ const goBack = () => router.back();
             <div v-else class="image-placeholder">Нет обложки</div>
           </div>
           <BaseButton
-            variant="add"
-            ,
-            text="добавить книгу"
+            :variant="bookPage ? 'dell' : 'add'"
+            :text="bookPage ? 'убрать с полки' : 'добавить на полку'"
             class="add-button"
+            @click="handleAction"
           />
         </div>
 
         <div class="info-card__text-container">
           <h1 class="title">{{ book.title }}</h1>
+          <p>{{ book.author }}</p>
 
           <div v-if="book.genres?.length" class="genres-row">
             <GenreBar :genres="book.genres" />
@@ -148,7 +171,7 @@ const goBack = () => router.back();
       padding: 6px 12px;
       border-radius: 12px;
       font-size: 16px;
-      
+
     .book-image
       width: 100%
       height: auto

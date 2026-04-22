@@ -15,6 +15,7 @@ export const getBookById = async (c: Context) => {
       return c.json({
         id: book.id,
         title: book.bookName,
+        author: book.author?.name,
         description: book.description,
         image: book.image,
         reliseYear: book.realiseYear ? Number(book.realiseYear) : 0,
@@ -24,17 +25,30 @@ export const getBookById = async (c: Context) => {
         
       });
     }
-     const response = await fetch(`https://openlibrary.org/books/${id}.json`)
- 
-    if (!response.ok) {
-      return c.json({ error: 'Книга не найдена ни в базе, ни в Open Library' }, 404);
-    }
 
-    const externalData = await response.json();
+    const response = await fetch(`https://openlibrary.org/works/${id}.json`);
+        if (!response.ok) return c.json({ error: 'Книга не найдена' }, 404);
+
+        const externalData = await response.json();
+
+        // --- ЛОГИКА ПОЛУЧЕНИЯ ИМЕНИ АВТОРА ---
+        let authorName = "Неизвестный автор";
+
+        if (externalData.authors && externalData.authors.length > 0) {
+          const authorKey = externalData.authors[0].author.key; // Например, /authors/OL123A
+
+          // Делаем второй запрос за именем
+          const authorRes = await fetch(`https://openlibrary.org${authorKey}.json`);
+          if (authorRes.ok) {
+            const authorData = await authorRes.json();
+            authorName = authorData.name; // Вот теперь у нас есть реальное имя!
+          }
+      }
 
     const mappedBook = {
       id: id,
       title: externalData.title,
+      author: authorName,
       description: typeof externalData.description === 'string'
         ? externalData.description
         : externalData.description?.value || "Описание отсутствует",

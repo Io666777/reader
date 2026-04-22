@@ -4,32 +4,66 @@ import prisma from "../../lib/prisma";
 export const addBook = async (c: Context) => {
   try {
     const body = await c.req.json();
+    
+    // 1. Извлекаем данные с дефолтными значениями сразу
+    const id = body.id;
+    const title = body.title || "Без названия";
+    const authorName = body.author || "Неизвестный автор";
+    const image = body.image || null;
+    const description = body.description || "";
+    const realiseYear = String(body.reliseYear || "");
+    const genresList = Array.isArray(body.genres) ? body.genres : [];
 
-    const newBook = await prisma.book.create({
-      data: {
-        isbn: body.isbn,
-        bookName: body.title,
-        image: body.cover,
-        realiseYear: String(body.year),
+    if (!id) {
+      return c.json({ success: false, error: "ID книги обязателен" }, 400);
+    }
+
+    // 2. Выполняем операцию
+    const book = await prisma.book.upsert({
+      where: { id: id },
+      update: {
+        bookName: title,
+        image: image,
+        description: description,
+        realiseYear: realiseYear,
+      }, 
+      create: {
+        id: id,
+        bookName: title,
+        image: image,
+        description: description,
+        realiseYear: realiseYear,
+        // Обязательная связь с автором 
         author: {
           connectOrCreate: {
-            where: { name: body.author }, 
-            create: { name: body.author }
+            where: { name: authorName },
+            create: { name: authorName }
           }
+        },
+        // Связь с жанрами
+        genres: {
+          connectOrCreate: genresList.map((g: string) => ({
+            where: { name: g },
+            create: { name: g }
+          }))
         }
       },
-      include: {
-        author: true 
+      include: { 
+        author: true,
+        genres: true 
       }
     });
 
-    return c.json(newBook, 201);
-  } catch (error) {
-    console.error('Prisma Error:', error);
-    return c.json({ error: 'Ошибка сохранения: возможно, такой ISBN уже есть' }, 500);
+    return c.json({ success: true, data: book }, 201);
+  } catch (error: any) {
+    console.error('Ошибка Prisma:', error.message);
+    // Выводим конкретное поле, вызвавшее ошибку, если оно есть в meta
+    if (error.meta) console.error('Детали ошибки:', error.meta);
+    
+    return c.json({ 
+      success: false, 
+      error: 'Ошибка базы данных', 
+      details: error.message 
+    }, 500);
   }
 };
-
-export function getAll(arg0: string, getAll: any) {
-    throw new Error("Function not implemented.");
-}

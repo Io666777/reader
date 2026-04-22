@@ -8,7 +8,7 @@ datasource db {
 
 model Book {
   id          String   @id @default(uuid())
-  isbn        String   @unique
+  isbn        String?   @unique
   bookName    String?
   image       String?
   realiseYear String?
