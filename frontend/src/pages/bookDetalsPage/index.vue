@@ -17,7 +17,7 @@ const isLoading = ref(true);
 const isProcessing = ref(false);
 
 const bookPage = computed(() => {
-  return route.query.from === 'home';
+  return route.query.from === 'home' || (book.value && !book.value.isExternal);
 });
 
 onMounted(async () => {

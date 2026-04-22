@@ -47,9 +47,7 @@ const getAuthorName = (author: any) => {
           {{ getAuthorName(book.author) }}
         </p>
 
-        <div v-if="book.genres?.length" class="book-card__genres">
-          {{ book.genres.join(', ') }}
-        </div>
+
 
         <div class="book-card__footer">
           <span class="book-card__year">
