@@ -1,5 +1,6 @@
 import type { Context } from "hono";
 import prisma from "../../lib/prisma"; // Используй свой готовый инстанс prisma
+import { formatBook, formatExternalBook } from "../../utils/formatters";
 
 export const getBookById = async (c: Context) => {
   const id = c.req.param('id');
@@ -12,18 +13,7 @@ export const getBookById = async (c: Context) => {
     });
 
     if (book) {
-      return c.json({
-        id: book.id,
-        title: book.bookName,
-        author: book.author?.name,
-        description: book.description,
-        image: book.image,
-        reliseYear: book.realiseYear ? Number(book.realiseYear) : 0,
-        rating: book.rating,
-        genres: book.genres.map(g=> g.name),
-        isExternal: false
-        
-      });
+      return c.json(formatBook(book)) ;
     }
 
     const response = await fetch(`https://openlibrary.org/works/${id}.json`);
@@ -45,23 +35,9 @@ export const getBookById = async (c: Context) => {
           }
       }
 
-    const mappedBook = {
-      id: id,
-      title: externalData.title,
-      author: authorName,
-      description: typeof externalData.description === 'string'
-        ? externalData.description
-        : externalData.description?.value || "Описание отсутствует",
-      image: externalData.covers
-        ? `https://covers.openlibrary.org/b/id/${externalData.covers[0]}-L.jpg`
-        : null,
-      realiseYear: externalData.first_publish_year || "-", 
-      rating: externalData.ratings_average || 0,
-      genres: externalData.subjects || externalData.subject || [],
-      isExternal: true
-    };
+
  
-    return c.json(mappedBook);
+    return c.json(formatExternalBook(id!, externalData, authorName));
 
   } catch (error) {
     console.error(error);  
