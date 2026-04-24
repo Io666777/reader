@@ -92,7 +92,7 @@ const goBack = () => router.back();
           </div>
 
           <p class="year">
-            Год издания: <strong>{{ book.reliseYear || 'Неизвестно' }}</strong>
+            Год издания: <strong>{{ book.realiseYear || 'Неизвестно' }}</strong>
           </p>
 
           <div class="description-section">

@@ -40,7 +40,7 @@ export const prepareBookInput = (body: any) => {
     image: body.image || null,
     description: body.description || "",
     // Унифицируем поле года (исправляем опечатку фронта здесь)
-    realiseYear: body.reliseYear ? String(body.reliseYear) : "",
+    realiseYear: body.realiseYear ? String(body.realiseYear) : "",
     genresList: Array.isArray(body.genres) ? (body.genres as string[]) : [],
   };
 };

@@ -4,7 +4,7 @@ export interface Detals{
     author: string;
     description: string
     image: string
-    reliseYear: number
+    realiseYear: number
     isExternal: boolean
     genres: string[]
 }

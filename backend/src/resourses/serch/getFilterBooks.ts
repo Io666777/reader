@@ -14,12 +14,11 @@ export const getFilterBooks = async(c:Context)=>{
     }
 
     if(year){
-        where.reliseYear=year
+        where.realiseYear=year
     }
 
     try{
         
-
         const books =await prisma.book.findMany({
             where,
             include:{
