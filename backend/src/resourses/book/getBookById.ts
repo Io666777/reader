@@ -1,46 +1,46 @@
 import type { Context } from "hono";
-import prisma from "../../lib/prisma"; // Используй свой готовый инстанс prisma
+import prisma from "../../lib/prisma";
 import { formatBook, formatExternalBook } from "../../utils/formatters";
 
 export const getBookById = async (c: Context) => {
   const id = c.req.param('id');
-   
+  const apiKey = process.env.GOOGLE_BOOKS_API_KEY; // Наш новый ключ из .env
+
   try {
- 
+    // 1. Сначала ищем в своей БД
     const book = await prisma.book.findUnique({
       where: { id: id },
       include: { author: true, genres: true }
     });
 
     if (book) {
-      return c.json(formatBook(book)) ;
+      return c.json(formatBook(book));
     }
 
-    const response = await fetch(`https://openlibrary.org/works/${id}.json`);
-        if (!response.ok) return c.json({ error: 'Книга не найдена' }, 404);
+    // 2. Если в базе нет, идем в Google Books
+    // URL для получения ОДНОЙ книги по ID
+    const response = await fetch(
+      `https://www.googleapis.com/books/v1/volumes/${id}?key=${apiKey}`
+    );
 
-        const externalData = await response.json();
+    if (!response.ok) {
+      return c.json({ error: 'Книга не найдена во внешнем источнике' }, 404);
+    }
 
-        // --- ЛОГИКА ПОЛУЧЕНИЯ ИМЕНИ АВТОРА ---
-        let authorName = "Неизвестный автор";
+    const externalData = await response.json();
 
-        if (externalData.authors && externalData.authors.length > 0) {
-          const authorKey = externalData.authors[0].author.key; // Например, /authors/OL123A
+    // 3. Извлекаем данные (у Google всё лежит в объекте volumeInfo)
+    const info = externalData.volumeInfo;
+    
+    // Автор сразу здесь, массив строк. Берем первого или джойним.
+    const authorName = info.authors ? info.authors.join(", ") : "Неизвестный автор";
 
-          // Делаем второй запрос за именем
-          const authorRes = await fetch(`https://openlibrary.org${authorKey}.json`);
-          if (authorRes.ok) {
-            const authorData = await authorRes.json();
-            authorName = authorData.name; // Вот теперь у нас есть реальное имя!
-          }
-      }
-
-
- 
+    // 4. Возвращаем результат
+    // Важно: проверь, чтобы formatExternalBook принимал данные от Google
     return c.json(formatExternalBook(id!, externalData, authorName));
 
-  } catch (error) {
-    console.error(error);  
-    return c.json({ error: 'server error' }, 500);
+  } catch (error: any) {
+    console.error('Ошибка при получении книги:', error.message);
+    return c.json({ error: 'Внутренняя ошибка сервера' }, 500);
   }
 };

@@ -13,34 +13,42 @@ export const formatBook = (book:any)=>{
     }
 }
 
-export const formatExternalBook = (id: string, data: any, authorName: string) => {
+export const formatExternalBook = (item: any) => {
+  const info = item.volumeInfo || {};
+  const id = item.id;
+
+  const authorName = info.authors ? info.authors.join(', ') : 'Неизвестный автор';
+
   return {
     id: id,
-    title: data.title,
+    title: info.title || 'Без названия',
     author: authorName,
-    description: typeof data.description === 'string' 
-      ? data.description 
-      : data.description?.value || '',
-    image: data.covers 
-      ? `https://covers.openlibrary.org/b/id/${data.covers[0]}-L.jpg` 
-      : null,
-    realiseYear: data.first_publish_date || '0',
-    rating: 0,
-    genres: [],
+    description: info.description || '',
+    image: info.imageLinks?.thumbnail || info.imageLinks?.smallThumbnail || null,
+    realiseYear: info.publishedDate ? info.publishedDate.substring(0, 4) : '0',
+    rating: info.averageRating ? Number(info.averageRating.toFixed(1)) : 0,
+    genres: info.categories ? info.categories.slice(0, 3) : [],
     isExternal: true
   };
 };
 
 // Преобразование входящих данных (с фронта или API) в формат, понятный для Prisma
 export const prepareBookInput = (body: any) => {
+  const isGoogle = !!body.volumeInfo;
+  const info = isGoogle ? body.volumeInfo : body;
   return {
-    id: body.id as string,
-    title: body.title || "Без названия",
-    authorName: body.author || "Неизвестный автор",
-    image: body.image || null,
-    description: body.description || "",
-    // Унифицируем поле года (исправляем опечатку фронта здесь)
-    realiseYear: body.realiseYear ? String(body.realiseYear) : "",
-    genresList: Array.isArray(body.genres) ? (body.genres as string[]) : [],
+    id: body.id?.toString() || "", 
+    title: info.title || info.bookName || "Без названия",
+    authorName: Array.isArray(info.authors) 
+      ? info.authors[0] 
+      : (info.author || "Неизвестный автор"),
+    image: info.imageLinks?.thumbnail || info.image || null,
+    description: info.description || "",
+    realiseYear: info.publishedDate 
+      ? info.publishedDate.substring(0, 4) 
+      : (body.realiseYear ? String(body.realiseYear) : ""),
+    genresList: Array.isArray(info.categories) 
+      ? info.categories 
+      : (Array.isArray(body.genres) ? body.genres : []),
   };
 };

@@ -1,5 +1,6 @@
 import type { Context } from "hono";
 import prisma from "../../lib/prisma";
+import { formatBook } from "../../utils/formatters";
 
 export const getFilterBooks = async(c:Context)=>{
     const genre = c.req.query('genre')
@@ -27,17 +28,8 @@ export const getFilterBooks = async(c:Context)=>{
             }
         })
 
-    const mappedBooks = books.map(book=>({
-      id: book.id,
-      bookName: book.bookName,
-      author: book.author.name,
-      image: book.image,
-      realiseYear: book.realiseYear,
-      rating: book.rating,
-      genre: book.genres.map(g=>g.name),
-      isbn: book.isbn
-    }))
-    return c.json(mappedBooks);
+    return c.json(books.map(formatBook));
+    
     }catch (error) {
     return c.json({ error: "Ошибка при фильтрации" }, 500);
   }

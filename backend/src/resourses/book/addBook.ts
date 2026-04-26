@@ -9,7 +9,7 @@ export const addBook = async (c: Context) => {
     // 1. Извлекаем данные
     const input = prepareBookInput(body);
 
-if (!input.id) {
+    if (!input.id) {
       return c.json({ success: false, error: "ID книги обязателен" }, 400);
     }
 
