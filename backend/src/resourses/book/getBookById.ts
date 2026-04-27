@@ -37,7 +37,7 @@ export const getBookById = async (c: Context) => {
 
     // 4. Возвращаем результат
     // Важно: проверь, чтобы formatExternalBook принимал данные от Google
-    return c.json(formatExternalBook(id!, externalData, authorName));
+    return c.json(formatExternalBook(externalData));
 
   } catch (error: any) {
     console.error('Ошибка при получении книги:', error.message);

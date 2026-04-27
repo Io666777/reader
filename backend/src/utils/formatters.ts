@@ -17,14 +17,19 @@ export const formatExternalBook = (item: any) => {
   const info = item.volumeInfo || {};
   const id = item.id;
 
+  const rawImage = info.imageLinks?.thumbnail || info.imageLinks?.smallThumbnail || null;
   const authorName = info.authors ? info.authors.join(', ') : 'Неизвестный автор';
+
+  const safeImage = rawImage 
+    ? rawImage.replace('http://', 'https://').replace('&edge=curl', '') 
+    : null;
 
   return {
     id: id,
     title: info.title || 'Без названия',
     author: authorName,
     description: info.description || '',
-    image: info.imageLinks?.thumbnail || info.imageLinks?.smallThumbnail || null,
+    image: safeImage,
     realiseYear: info.publishedDate ? info.publishedDate.substring(0, 4) : '0',
     rating: info.averageRating ? Number(info.averageRating.toFixed(1)) : 0,
     genres: info.categories ? info.categories.slice(0, 3) : [],
