@@ -1,15 +1,18 @@
 <script setup lang="ts">
+import FilterButton from '../filterButton/index.vue';
 
 defineProps<{
   modelValue: string;
 }>();
 
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue']);
 
 const onInput = (event: Event) => {
   const target = event.target as HTMLInputElement;
   emit('update:modelValue', target.value);
 };
+
+// const toggleSidebar
 </script>
 
 <template>
@@ -38,6 +41,7 @@ const onInput = (event: Event) => {
         class="base-input__field"
         placeholder="Поиск книг..."
       />
+      <!-- <FilterButton :is-loaded="true" @click="toggleSidebar" /> -->
     </div>
   </div>
 </template>

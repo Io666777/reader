@@ -1,20 +1,20 @@
+<script setup lang="ts">
+const props = defineProps<{
+  isLoaded?: boolean;
+}>();
+
+const emit = defineEmits<{
+  (e: 'click'): void;
+}>();
+</script>
+
 <template>
-  <button class="filter-btn">
-    <svg 
-      class="filter-btn__icon" 
-      width="18" 
-      height="18" 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path 
-        d="M4 6H20M6 12H18M10 18H14" 
-        stroke="currentColor" 
-        stroke-width="2" 
-        stroke-linecap="round"
-      />
-    </svg>
+  <button
+    class="filter-btn"
+    :disabled="isLoaded === false"
+    @click="emit('click')"
+  >
+  <img src="../../../public/list.svg">
     <span class="filter-btn__text">Фильтры</span>
   </button>
 </template>
