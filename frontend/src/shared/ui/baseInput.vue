@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import FilterButton from '../filterButton/index.vue';
-
 defineProps<{
   modelValue: string;
 }>();
@@ -41,7 +39,6 @@ const onInput = (event: Event) => {
         class="base-input__field"
         placeholder="Поиск книг..."
       />
-      <!-- <FilterButton :is-loaded="true" @click="toggleSidebar" /> -->
     </div>
   </div>
 </template>

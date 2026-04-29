@@ -2,7 +2,7 @@
 import { onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import baseInput from '../../shared/ui/baseInput.vue';
-import BookCard from '../../entities/book/ui/catalogBookCard.vue';
+import BookCard from '../../entities/book/catalogBookCard.vue';
 import { getBySerch } from './api/get-by-serch';
 import type { BookDisplayData } from '../../entities/book/types';
 
@@ -46,6 +46,7 @@ watch(searchQuery, handleSearch);
 
 <template>
   <baseInput v-model="searchQuery" />
+  <serchButton />
   <div class="books-grid">
     <BookCard v-for="item in books" :key="item.isbn" :book="item" />
   </div>

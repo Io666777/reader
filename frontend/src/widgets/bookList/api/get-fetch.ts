@@ -1,6 +1,6 @@
 import type { ParamBooks } from "../types";
 
-export const fetchBook = async(params: ParamBooks)=>{
+export const getFetchBook = async(params: ParamBooks)=>{
     try{
         const queryParams = new URLSearchParams()
 
