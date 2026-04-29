@@ -1,12 +1,23 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
+import type { Filter } from './type';
+import { getFilter } from './api/get-filter';
 
-const availableGenres = ref<string[]>([]);
-const availableYears = ref<number[]>([]);
+const selectedGenre = defineModel<string>('genre');
+const selectedYear = defineModel<string | number>('year');
 
-onMounted(async()=>{
-  
-})
+const genres = ref<string[]>([]);
+const years = ref<number[]>([]);
+
+onMounted(async () => {
+  try {
+    const data = await getFilter();
+    genres.value = data.genres;
+    years.value = data.years;
+  } catch (e) {
+    console.error('Не удалось загрузить фильтры', e);
+  }
+});
 </script>
 
 <template>
