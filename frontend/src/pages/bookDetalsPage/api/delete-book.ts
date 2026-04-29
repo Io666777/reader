@@ -1,14 +1,7 @@
-export async function deleteBook(id: string){
-    const response = await fetch(`http://localhost:3000/api/books/${id}`,{
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
+import { apiRequest } from '../../../shared/api/base';
 
-if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || 'Ошибка при удалении книги');
-    }
-    return await response.json();
-}
+
+export const deleteBook = (id: string) =>
+    apiRequest(`/books/${id}`, {
+        method: 'DELETE'
+    });
