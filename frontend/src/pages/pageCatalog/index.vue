@@ -3,5 +3,5 @@ import bookSerch from '../../widgets/bookSerch/index.vue';
 </script>
 
 <template>
-  <bookSerch />
+  <bookSerch mode="global" />
 </template>

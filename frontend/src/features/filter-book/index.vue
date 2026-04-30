@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import type { Filter } from './type';
 import { getFilter } from './api/get-filter';
 
 const selectedGenre = defineModel<string>('genre');

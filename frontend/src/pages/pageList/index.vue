@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import bookCatalog from '../../widgets/bookList/index.vue';
+import bookSerch from '../../widgets/bookSerch/index.vue';
 </script>
 
 <template>
-  <bookCatalog />
+  <bookSerch mode="local" />
 </template>

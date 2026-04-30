@@ -1,6 +1,7 @@
 <script setup lang="ts">
-defineProps<{
+const props = defineProps<{
   modelValue: string;
+  mode: 'local' | 'global';
 }>();
 
 const emit = defineEmits(['update:modelValue']);
@@ -37,7 +38,9 @@ const onInput = (event: Event) => {
         :value="modelValue"
         @input="onInput"
         class="base-input__field"
-        placeholder="Поиск книг..."
+        :placeholder="
+          mode === 'local' ? 'Поиск в коллекции...' : 'Поиск в мире...'
+        "
       />
     </div>
   </div>

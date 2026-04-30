@@ -40,7 +40,7 @@ export const addBook = async (c: Context) => {
           }
         },
         genres: {
-          connectOrCreate: input.genresList.map((name) => ({
+          connectOrCreate: input.genresList.map((name: any) => ({
             where: { name },
             create: { name }
           }))
