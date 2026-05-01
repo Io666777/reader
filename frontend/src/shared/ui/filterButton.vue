@@ -1,30 +1,37 @@
 <script setup lang="ts">
-defineProps<{
-  isOpen: boolean;
-}>();
-defineEmits(['close']);
+    const props=defineProps<{
+        isOpen: boolean
+    }>()
+
+    defineEmits(['click'])
 </script>
 
 <template>
-  <div v-if="isOpen" class="open" @click="$emit('close')">
-    <div class="open__content" @click.stop>
-      <slot></slot>
-    </div>
-  </div>
+    <button 
+        class="filter-btn" 
+        :class="{ 'filter-btn--active': isOpen }"
+        @click="$emit('click')">
+
+        <img src="/list.svg"
+    </button>
 </template>
 
 <style scoped lang="sass">
-.open
-    position: absolute
-    top: 100%
-    right: 0
-    margin-top: 10px
-    z-index: 100
-    &__content
-        background: white
-        border-radius: 12px
-        box-shadow: 0 8px 24px rgba(0,0,0,0.15)
-        border: 1px solid #eee
-        padding: 16px
-        min-width: 200px
+.filter-btn
+  background: white
+  border: 1px solid #eee
+  border-radius: 10px
+  padding: 8px
+  cursor: pointer
+  transition: all 0.2s
+  display: flex
+  align-items: center
+  justify-content: center
+
+  &:hover
+    background: #f5f5f5
+
+  &--active
+    border-color: #2196f3
+    background: #e3f2fd
 </style>
