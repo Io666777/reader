@@ -13,11 +13,9 @@ const emit = defineEmits(['applyFilters']);
 
 const isFilterOpen = ref(false);
 
-// Данные из API
 const genresData = ref<any[]>([]);
 const yearsData = ref<string[]>([]);
 
-// Состояние выбранных фильтров[cite: 4]
 const selectedGenre = ref<string | null>(null);
 const selectedYear = ref<string | null>(null);
 
@@ -38,7 +36,6 @@ const loadData = async () => {
 
 onMounted(loadData);
 
-// Логика выбора (Toggle)[cite: 4]
 const toggleGenre = (genre: string) => {
   selectedGenre.value = selectedGenre.value === genre ? null : genre;
 };
@@ -47,7 +44,6 @@ const toggleYear = (year: string) => {
   selectedYear.value = selectedYear.value === year ? null : year;
 };
 
-// Действия в футере[cite: 2, 4]
 const handleReset = () => {
   selectedGenre.value = null;
   selectedYear.value = null;
@@ -72,7 +68,6 @@ const filteredGenres = computed(() => {
 
 <template>
   <div class="filter-wrapper">
-    <!-- Кнопка вызова фильтров[cite: 1, 4] -->
     <contentButton
       :isOpen="isFilterOpen"
       @click="isFilterOpen = !isFilterOpen"
@@ -80,7 +75,6 @@ const filteredGenres = computed(() => {
       <img src="/list.svg" alt="filter icon" />
     </contentButton>
 
-    <!-- Модальное окно[cite: 2, 4] -->
     <modal
       :isOpen="isFilterOpen"
       :title="mode === 'local' ? 'Фильтры библиотеки' : 'Поиск по жанрам'"
@@ -106,7 +100,6 @@ const filteredGenres = computed(() => {
           </div>
         </div>
 
-        <!-- Секция Годов (только для локального режима)[cite: 4] -->
         <div v-if="mode === 'local' && yearsData.length" class="filter-group">
           <span class="filter-group__title">Год издания</span>
           <div class="filter-group__list">
