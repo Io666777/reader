@@ -1,19 +1,20 @@
 <script setup lang="ts">
-    const props=defineProps<{
-        isOpen: boolean
-    }>()
+const props = defineProps<{
+  isOpen: boolean;
+//   icon?: string;
+}>();
 
-    defineEmits(['click'])
+defineEmits(['click']);
 </script>
 
 <template>
-    <button 
-        class="filter-btn" 
-        :class="{ 'filter-btn--active': isOpen }"
-        @click="$emit('click')">
-
-        <img src="/list.svg"
-    </button>
+  <button
+    class="filter-btn"
+    :class="{ 'filter-btn--active': isOpen }"
+    @click="$emit('click')"
+  >
+    <slot> </slot>
+  </button>
 </template>
 
 <style scoped lang="sass">
