@@ -1,5 +1,5 @@
 import type { Context } from "hono";
-import prisma from "../../lib/prisma";
+import prisma from "../../../lib/prisma";
 
 export const getAvailableFilters = async (c: Context) => {
   console.log("Запрос дошел до getAvailableFilters!"); // Появится ли это в консоли терминала?

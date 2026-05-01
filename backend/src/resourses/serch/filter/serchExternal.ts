@@ -1,5 +1,5 @@
 import type { Context } from "hono";
-import { formatExternalBook } from "../../utils/formatters"; // Импортируем
+import { formatExternalBook } from "../../../utils/formatters"; // Импортируем
 
 export const searchExternal = async (c: Context) => {
   const title = c.req.query('title');

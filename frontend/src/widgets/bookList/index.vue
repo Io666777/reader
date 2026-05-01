@@ -28,6 +28,7 @@ onMounted(loadBooks);
 <style scoped lang="sass">
 .books-grid
   display: grid
+  width: 100%
   grid-template-columns: repeat(auto-fill, minmax(190px, 1fr))
   gap: 32px 24px
   padding: 24px

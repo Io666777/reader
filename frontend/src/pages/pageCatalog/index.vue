@@ -5,7 +5,8 @@ import filterForBook from '../../widgets/bookFilter/index.vue';
 
 <template>
   <div class="cont">
-    <filterForBook mode="global" /> <bookSerch mode="global" />
+    <!-- <filterForBook mode="global" />  -->
+    <bookSerch mode="global" />
   </div>
 </template>
 

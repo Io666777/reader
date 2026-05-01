@@ -96,6 +96,7 @@ onMounted(async () => {
 <style scoped lang="sass">
 .search-page
   padding: 20px
+  width: 100%
 
 .search-header
   display: flex
