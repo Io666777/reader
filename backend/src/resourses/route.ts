@@ -7,12 +7,14 @@ import * as serch from "./serch/filter/serchExternal";
 import { getBookById } from "./book/getBookById";
 import { getAvailableFilters } from "./serch/filter/getAvailableFilters";
 import { getGlobalGenres } from "./serch/filter/getGlobalGenres"; 
+import { getRandom } from "./serch/getRandom";
 
 
 const bookRoute = new Hono();
 bookRoute.get('/genres/all', getGlobalGenres);
 bookRoute.get('/search', serch.searchExternal);
 bookRoute.get('/filter', getAvailableFilters);
+bookRoute.get('/random', getRandom)
 
 bookRoute.get('/', getAll);
 bookRoute.post('/:id', addBook);
