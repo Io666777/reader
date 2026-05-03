@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import bookSerch from '../../widgets/bookSerch/index.vue';
+import randomButtom from '../../widgets/bookRandom/index.vue'
 import catalogBookCard from '../../entities/book/catalogBookCard.vue';
 import type { BookDisplayData } from '../../entities/book/types';
 import { ref } from 'vue';
@@ -15,6 +16,7 @@ const handleSearchUpdate = (newBooks: BookDisplayData[]) => {
   <div class="search-page">
     <div class="search-bar">
       <bookSerch mode="global" @update:books="handleSearchUpdate" />
+      <randomButtom></randomButtom>
     </div>
 
     <div v-if="books.length > 0" class="books-grid">
