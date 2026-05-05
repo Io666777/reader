@@ -1,4 +1,4 @@
-import { topics } from "../../utils/keyWord";
+import { topics } from "../../../utils/keyWord";
 import type { Context } from "hono";
 
 export const getRandom = async (c: Context): Promise<any> => {

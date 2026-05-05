@@ -1,34 +1,58 @@
 <script setup lang="ts">
 import bookSerch from '../../widgets/bookSerch/index.vue';
-import randomButtom from '../../widgets/bookRandom/index.vue'
+import randomButtom from '../../widgets/bookRandom/index.vue';
 import catalogBookCard from '../../entities/book/catalogBookCard.vue';
 import type { BookDisplayData } from '../../entities/book/types';
-import { ref } from 'vue';
+import { getRandomBooks } from './api/get-random-books';
+import { onMounted, ref } from 'vue';
 
 const books = ref<BookDisplayData[]>([]);
+const isLoading = ref(false);
 
 const handleSearchUpdate = (newBooks: BookDisplayData[]) => {
   books.value = newBooks;
 };
+
+const loadRandomBooks = async () => {
+  isLoading.value = true;
+  try {
+    const response = await getRandomBooks();
+
+    if (response && response.book) {
+      books.value = response.book;
+    } else {
+      books.value = [];
+    }
+  } catch (error) {
+    console.error('Ошибка:', error);
+    books.value = [];
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+onMounted(() => {
+  loadRandomBooks();
+});
 </script>
 
 <template>
   <div class="search-page">
     <div class="search-bar">
       <bookSerch mode="global" @update:books="handleSearchUpdate" />
-      <randomButtom></randomButtom>
+      <randomButtom @click="loadRandomBooks" />
     </div>
 
-    <div v-if="books.length > 0" class="books-grid">
-      <catalogBookCard
-        v-for="item in books"
-        :key="item.id || item.isbn"
-        :book="item"
-      />
+    <div v-if="isLoading" class="loading-state">
+      Ищем интересные книги для вас...
+    </div>
+
+    <div v-else-if="books.length" class="books-grid">
+      <catalogBookCard v-for="item in books" :key="item.id" :book="item" />
     </div>
 
     <div v-else class="empty-results">
-      Введите название книги или автора, чтобы начать поиск
+      Ничего не нашлось. Попробуйте обновить страницу.
     </div>
   </div>
 </template>

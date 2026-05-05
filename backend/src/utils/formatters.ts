@@ -1,16 +1,16 @@
 export const formatBook = (book:any)=>{
-    return{
-    id: book.id,
-    title: book.bookName, 
-    author: book.author?.name || 'Неизвестный автор',
-    description: book.description || '',
-    image: book.image || '/placeholder.jpg',
-    realiseYear: book.realiseYear ? Number(book.realiseYear) : 0,
-    rating: book.rating || 0,
-    genres: book.genres?.map((g: any) => g.name) || [],
-    isbn: book.isbn || '',
-    isExternal: false
-    }
+  return{
+  id: book.id,
+  title: book.bookName, 
+  author: book.author?.name || 'Неизвестный автор',
+  description: book.description || '',
+  image: book.image || '/placeholder.jpg',
+  realiseYear: book.realiseYear ? Number(book.realiseYear) : 0,
+  rating: book.rating || 0,
+  genres: book.genres?.map((g: any) => g.name) || [],
+  isbn: book.isbn || '',
+  isExternal: false
+  }
 }
 
 export const formatExternalBook = (item: any) => {
@@ -25,12 +25,14 @@ export const formatExternalBook = (item: any) => {
     : null;
 
   return {
-    id: id,
+    id: item.id,
     title: info.title || 'Без названия',
     author: authorName,
     description: info.description || '',
     image: safeImage,
+    cover: safeImage, // Добавьте это, чтобы карточка увидела обложку
     realiseYear: info.publishedDate ? info.publishedDate.substring(0, 4) : '0',
+    year: info.publishedDate ? info.publishedDate.substring(0, 4) : '0', // Для поля book.year
     rating: info.averageRating ? Number(info.averageRating.toFixed(1)) : 0,
     genres: info.categories ? info.categories.slice(0, 3) : [],
     isExternal: true

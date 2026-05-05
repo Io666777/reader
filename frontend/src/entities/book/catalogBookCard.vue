@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { BookDisplayData } from '../types';
+import type { BookDisplayData } from './types';
 
 const props = defineProps<{
   book: BookDisplayData;
