@@ -11,7 +11,7 @@ const randomClick = async () => {
     if (book && book.id) {
       router.push({ name: 'bookDetals', params: { id: book.id } });
     } else {
-      alert('Попробуй еще раз');
+    
       console.warn('Метаданные поиска:', response?.metadata);
     }
   } catch (error) {
