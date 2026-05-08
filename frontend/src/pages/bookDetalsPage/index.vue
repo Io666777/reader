@@ -21,6 +21,7 @@ const bookPage = computed(() => {
 });
 
 onMounted(async () => {
+  if (book.value !== null) return;
   try {
     book.value = await getDetals(bookId);
   } catch (error) {

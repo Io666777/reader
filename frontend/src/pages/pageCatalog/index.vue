@@ -14,14 +14,14 @@ const handleSearchUpdate = (newBooks: BookDisplayData[]) => {
 };
 
 const loadRandomBooks = async () => {
+  if (isLoading.value) return;
+
   isLoading.value = true;
   try {
     const response = await getRandomBooks();
 
-    if (response && response.book) {
+    if (response?.book) {
       books.value = response.book;
-    } else {
-      books.value = [];
     }
   } catch (error) {
     console.error('Ошибка:', error);
@@ -31,8 +31,10 @@ const loadRandomBooks = async () => {
   }
 };
 
-onMounted(() => {
-  loadRandomBooks();
+onMounted(async () => {
+  if (books.value.length === 0 && !isLoading.value) {
+    await loadRandomBooks();
+  }
 });
 </script>
 
