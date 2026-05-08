@@ -2,14 +2,22 @@ import "dotenv/config";
 import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
 import{ cors } from 'hono/cors'
-import bookRoute from './resourses/route'
 import { trimTrailingSlash } from "hono/trailing-slash";
 
-const app = new Hono()
+import bookRoute from './resourses/route'
+import authRoute from './resourses/authRoute'
+
+type Variables = {
+  userId: string
+}
+
+const app = new Hono<{ Variables: Variables }>()
 
 app.use('*', cors())
 app.use('*', trimTrailingSlash())
+
 app.route('/api/books', bookRoute)
+app.route('/api/auth', authRoute)
 
 
 app.get('/', (c) => {
