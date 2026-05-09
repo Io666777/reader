@@ -71,7 +71,7 @@ const onInput = (event: Event) => {
     font-size: 15px
     font-family: inherit
     color: #2c3e50
-    background-color: #f1f3f5 // Светло-серый фон
+    background-color: #fafafa // Светло-серый фон
     border: 2px solid transparent // Прозрачная рамка, чтобы инпут не "прыгал" при фокусе
     border-radius: 12px
     outline: none

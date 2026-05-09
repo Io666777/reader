@@ -182,7 +182,7 @@ const goBack = () => router.back();
     .image-placeholder
       width: 100%
       height: 350px
-      background: #eee
+      background: #fafafa
       display: flex
       align-items: center
       justify-content: center
@@ -210,7 +210,7 @@ const goBack = () => router.back();
 
       h3
         margin-bottom: 8px
-        border-bottom: 1px solid #eee
+        border-bottom: 1px solid #fafafa
         padding-bottom: 4px
 
       .description-text

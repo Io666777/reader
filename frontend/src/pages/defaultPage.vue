@@ -16,7 +16,7 @@ import sidebar from '../widgets/sidebar.vue';
 
 <style scoped lang="sass">
 $sidebar-width: 260px
-$bg-color: #f8f9fa
+$bg-color: #fdfdfd
 
 .layout
   display: flex

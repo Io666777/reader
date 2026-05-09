@@ -87,7 +87,7 @@ const badgeStyle = computed(() => ({
   box-shadow: 0 4px 15px rgba(0,0,0,0.15) // Сделали тень мягче
   opacity: 0
   transition: all 0.2s ease
-  border: 1px solid #eee // Добавили легкую рамку, так как фон белый
+  border: 1px solid #fafafa // Добавили легкую рамку, так как фон белый
   max-height: 200px
   overflow-y: auto
 
@@ -98,7 +98,7 @@ const badgeStyle = computed(() => ({
   font-size: 11px
   text-transform: uppercase
   margin-bottom: 6px
-  border-bottom: 1px solid #eee
+  border-bottom: 1px solid #fafafa
   padding-bottom: 4px
   color: #999
 

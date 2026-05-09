@@ -49,23 +49,19 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="search-page">
-    <div class="search-bar">
+  <div class="page-layout">
+    <div class="toolbar">
       <catalogFilter mode="global" @applyFilters="handleApplyFilters" />
-
       <bookSerch mode="global" @update:books="handleSearchUpdate" />
-
       <randomButtom @click="handleRandomClick" />
     </div>
 
     <div v-if="selectedGenre" class="active-filter">
       <span>Жанр: {{ selectedGenre }}</span>
-      <button @click="handleApplyFilters({ genre: null })" class="reset-filter">
-        ✕
-      </button>
+      <button @click="handleApplyFilters({ genre: null })" class="reset-filter">✕</button>
     </div>
 
-    <div v-if="isLoading" class="loading-state">
+    <div v-if="isLoading" class="status-state">
       Ищем интересные книги для вас...
     </div>
 
@@ -73,23 +69,23 @@ onMounted(async () => {
       <catalogBookCard v-for="item in books" :key="item.id" :book="item" />
     </div>
 
-    <div v-else class="empty-results">
+    <div v-else class="status-state">
       Ничего не нашлось. Попробуйте изменить параметры фильтра.
     </div>
   </div>
 </template>
 
 <style scoped lang="sass">
-.search-page
-  padding: 20px
+.page-layout
+  padding: 24px
   display: flex
   flex-direction: column
   align-items: center
-  gap: 30px
+  gap: 24px
 
-.search-bar
+.toolbar
   width: 100%
-  max-width: 800px // Увеличил, чтобы влез фильтр
+  max-width: 800px
   display: flex
   gap: 12px
   align-items: center
@@ -104,25 +100,18 @@ onMounted(async () => {
   border-radius: 20px
   font-size: 14px
   border: 1px solid #d1e9ff
-
-  .reset-filter
-    background: none
-    border: none
-    color: #007bff
-    cursor: pointer
-    font-weight: bold
-    &:hover
-      color: #ff4d4f
+  margin-top: -12px // Подтягиваем к тулбару
 
 .books-grid
   display: grid
   width: 100%
   grid-template-columns: repeat(auto-fill, minmax(190px, 1fr))
   gap: 32px 24px
-  padding: 24px
+  padding-top: 10px
 
-.loading-state, .empty-results
+.status-state
   color: #888
   margin-top: 50px
   font-size: 1.1rem
+  text-align: center
 </style>

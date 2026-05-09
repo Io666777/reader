@@ -18,11 +18,11 @@ const getInitials = (name: string) => {
     <nav class="sidebar__nav">
       <router-link to="/" class="nav-item" active-class="active">
         <span class="nav-item__icon">🏠</span>
-        Моя полка
+        <span class="nav-item__text">Моя полка</span>
       </router-link>
       <router-link to="/catalog" class="nav-item" active-class="active">
         <span class="nav-item__icon">🔍</span>
-        Поиск книг
+        <span class="nav-item__text">Поиск книг</span>
       </router-link>
     </nav>
 
@@ -32,12 +32,12 @@ const getInitials = (name: string) => {
           {{ getInitials(authStore.user.value?.username) }}
         </div>
         <div class="user-info">
-          <span class="user-name">{{
-            authStore.user.value?.username || 'Пользователь'
-          }}</span>
+          <span class="user-name">
+            {{ authStore.user.value?.username || 'Пользователь' }}
+          </span>
           <span class="user-status">Online</span>
         </div>
-        <button @click="authStore.logout()" class="logout-btn">
+        <button @click="authStore.logout()" class="logout-btn" title="Выйти">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="20"
@@ -49,26 +49,29 @@ const getInitials = (name: string) => {
             stroke-linecap="round"
             stroke-linejoin="round"
           >
-            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-            <line x1="9" y1="12" x2="15" y2="12"></line>
-            <polyline points="12 9 15 12 12 15"></polyline>
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
           </svg>
-        
         </button>
       </div>
     </div>
   </aside>
 </template>
+
 <style scoped lang="sass">
+// Переменные
 $sidebar-width: 260px
-$accent-color: #2196f3
-$text-main: #2c3e50
+
+$text-dark: #2c3e50
+$text-gray: #666
+$bg-hover: rgba(33, 150, 243, 0.08)
 
 .sidebar
   width: $sidebar-width
   height: 100vh
-  background: white
-  border-right: 1px solid #eee
+  background: #ffffff
+  border-right: 1px solid #f0f0f0
   display: flex
   flex-direction: column
   position: fixed
@@ -77,144 +80,112 @@ $text-main: #2c3e50
   z-index: 100
 
   &__logo
-    padding: 30px
+    padding: 32px 24px
     display: flex
     align-items: center
     gap: 12px
+    
     .logo-icon
-      font-size: 24px
+      font-size: 26px
+    
     .logo-text
-      font-size: 20px
+      font-size: 22px
       font-weight: 800
-      color: $text-main
+      color: $text-dark
+      letter-spacing: -0.5px
       margin: 0
 
   &__nav
     flex: 1
-    padding: 0 15px
+    padding: 0 16px
     display: flex
     flex-direction: column
-    gap: 8px
+    gap: 4px
 
     .nav-item
       display: flex
       align-items: center
       gap: 12px
-      padding: 12px 15px
+      padding: 12px 16px
       text-decoration: none
-      color: #666
-      border-radius: 10px
-      transition: all 0.2s
+      color: $text-gray
+      border-radius: 12px
+      transition: all 0.2s ease
       font-weight: 500
 
-      &:hover
-        background-color: rgba($accent-color, 0.05)
-        color: $accent-color
+      &__icon
+        font-size: 18px
 
-      &.active
-        background-color: $accent-color
-        color: white
+      &:hover
+        background-color: $bg-hover
+      &.active  
+        .nav-item__icon
+          filter: brightness(1.2)
 
   &__footer
-    padding: 20px
-    border-top: 1px solid #eee
+    padding: 20px 16px
+    border-top: 1px solid #f5f5f5
 
     .user-profile
       display: flex
       align-items: center
       gap: 12px
+      padding: 8px
+      background: #fafafa
+      border-radius: 16px
 
       .user-avatar
-        width: 36px
-        height: 36px
-        background: #f0f2f5
-        border-radius: 10px
+        min-width: 40px
+        height: 40px
+        background: #e3f2fd
+        border-radius: 12px
         display: flex
         align-items: center
         justify-content: center
-        font-weight: 600
-        font-size: 12px
-        color: $accent-color
+        font-weight: 700
+        font-size: 14px
 
       .user-info
         display: flex
         flex-direction: column
+        flex: 1
+        overflow: hidden
 
         .user-name
           font-size: 14px
-          font-weight: 600
-          color: $text-main
+          font-weight: 700
+          color: $text-dark
+          white-space: nowrap
+          overflow: hidden
+          text-overflow: ellipsis
 
         .user-status
           font-size: 11px
           color: #4caf50
-  // ... существующие стили ...
+          font-weight: 500
+          display: flex
+          align-items: center
+          gap: 4px
+          
+          &::before
+            content: ''
+            width: 6px
+            height: 6px
+            background: #4caf50
+            border-radius: 50%
 
-.sidebar__footer
-  padding: 20px
-  border-top: 1px solid #eee
+      .logout-btn
+        background: none
+        border: none
+        padding: 8px
+        color: #b0bec5
+        cursor: pointer
+        transition: all 0.2s
+        display: flex
+        align-items: center
+        border-radius: 8px
 
-  .user-profile
-    display: flex
-    align-items: center
-    gap: 12px
-    position: relative // для позиционирования кнопки выхода
-
-    .user-avatar
-      min-width: 36px // фиксируем ширину, чтобы не сжималась
-      height: 36px
-      background: #f0f2f5
-      border-radius: 10px
-      display: flex
-      align-items: center
-      justify-content: center
-      font-weight: 600
-      font-size: 14px
-      color: $accent-color
-
-    .user-info
-      display: flex
-      flex-direction: column
-      flex: 1 // занимает всё свободное место
-      overflow: hidden // чтобы длинные имена не ломали верстку
-
-      .user-name
-        font-size: 14px
-        font-weight: 600
-        color: $text-main
-        white-space: nowrap
-        text-overflow: ellipsis
-        overflow: hidden
-
-      .user-status
-        font-size: 11px
-        color: #4caf50
-
-    .logout-btn
-      background: none
-      border: none
-      cursor: pointer
-      padding: 5px
-      font-size: 16px
-      opacity: 0.5
-      transition: opacity 0.2s
-
-      &:hover
-        opacity: 1
-.logout-btn
-  display: flex
-  align-items: center
-  gap: 8px
-  background: none
-  border: none
-  color: #888
-  cursor: pointer
-  transition: color 0.2s
-  padding: 8px
-
-  &:hover
-    color: #2196f3 // Иконка поменяет цвет вместе с текстом благодаря stroke="currentColor"
-
-  svg
-    flex-shrink: 0
+        &:hover
+          color: #ff5252
+          background: rgba(255, 82, 82, 0.1)
 </style>

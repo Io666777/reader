@@ -91,7 +91,7 @@ defineEmits(['close', 'apply', 'reset']);
   &::-webkit-scrollbar
     width: 4px
   &::-webkit-scrollbar-thumb
-    background: #eee
+    background: #fafafa
     border-radius: 10px
 
 .modal-footer
@@ -116,7 +116,7 @@ defineEmits(['close', 'apply', 'reset']);
     background: #f5f5f5
     color: #666
     &:hover
-      background: #eeeeee
+      background: #fafafa
 
   .btn-apply
     background: #2196f3

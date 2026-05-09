@@ -20,7 +20,7 @@ defineEmits(['click']);
 <style scoped lang="sass">
 .filter-btn
   background: white
-  border: 1px solid #eee
+  border: 1px solid #fafafa
   border-radius: 10px
   padding: 8px
   cursor: pointer
@@ -32,7 +32,4 @@ defineEmits(['click']);
   &:hover
     background: #f5f5f5
 
-  &--active
-    border-color: #2196f3
-    background: #e3f2fd
 </style>

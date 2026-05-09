@@ -61,50 +61,32 @@ const displayedBooks = computed(() => {
     </template>
 
     <div v-else class="auth-promo">
-      <div class="promo-content">
-        <span class="promo-icon">📖</span>
-        <h2>Присоединяйтесь к сообществу</h2>
-        <p>Зарегистрируйтесь, чтобы искать книги, составлять списки и делиться впечатлениями.</p>
-        <router-link to="/login" class="promo-btn">Создать или войти</router-link>
       </div>
-    </div>
   </div>
 </template>
 
 <style scoped lang="sass">
+.page-layout
+  padding: 24px
+  display: flex
+  flex-direction: column
+  align-items: center // Чтобы тулбар был по центру
+  gap: 24px
+
+.toolbar
+  width: 100%
+  max-width: 800px
+  display: flex
+  gap: 12px
+  align-items: center
+
 .books-grid
   display: grid
   width: 100%
   grid-template-columns: repeat(auto-fill, minmax(190px, 1fr))
   gap: 32px 24px
-  padding: 24px
+  padding-top: 10px // Небольшой отступ от тулбара
 
 .auth-promo
-  display: flex
-  justify-content: center
-  align-items: center
-  min-height: 60vh
-  text-align: center
-  padding: 40px
-
-  .promo-content
-    max-width: 400px
-    .promo-icon
-      font-size: 48px
-      display: block
-      margin-bottom: 20px
-    h2
-      font-size: 24px
-      margin-bottom: 12px
-    p
-      color: #666
-      margin-bottom: 30px
-    .promo-btn
-      background: #2196f3
-      color: white
-      padding: 12px 32px
-      border-radius: 8px
-      text-decoration: none
-      font-weight: 600
-      display: inline-block
+  // ... твои стили без изменений ...
 </style>

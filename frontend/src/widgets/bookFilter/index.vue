@@ -159,7 +159,7 @@ const filteredGenres = computed(() => {
   color: #333
 
   &:hover
-    background: #eeeeee
+    background: #fafafa
 
   &.active
     background: #2196f3

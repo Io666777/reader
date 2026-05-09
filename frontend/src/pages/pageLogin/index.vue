@@ -159,7 +159,7 @@ $text: #2c3e50
   input
     padding: 14px 16px
     border-radius: 12px
-    border: 1px solid #eee
+    border: 1px solid #fafafa
     background: #fafafa
     font-size: 15px
     transition: all 0.2s

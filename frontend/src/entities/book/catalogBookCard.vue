@@ -72,7 +72,7 @@ const bookTitle = computed(() => {
     justify-content: center
     color: #aaa
     font-size: 12px
-    background: #eee
+    background: #fafafa
 
   &__rating-badge
     position: absolute
