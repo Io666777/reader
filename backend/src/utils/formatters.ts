@@ -40,22 +40,27 @@ export const formatExternalBook = (item: any) => {
 };
 
 // Преобразование входящих данных (с фронта или API) в формат, понятный для Prisma
+// backend/src/utils/formatters.ts
+
 export const prepareBookInput = (body: any) => {
   const isGoogle = !!body.volumeInfo;
   const info = isGoogle ? body.volumeInfo : body;
+
+  // Ищем картинку везде, где она может быть
+  const rawImage = info.imageLinks?.thumbnail || 
+                   info.imageLinks?.smallThumbnail || 
+                   body.image || 
+                   body.cover || 
+                   null;
+
   return {
     id: body.id?.toString() || "", 
     title: info.title || info.bookName || "Без названия",
-    authorName: Array.isArray(info.authors) 
-      ? info.authors[0] 
-      : (info.author || "Неизвестный автор"),
-    image: info.imageLinks?.thumbnail || info.image || null,
+    authorName: Array.isArray(info.authors) ? info.authors[0] : (info.author || "Неизвестный автор"),
+    // ОЧЕНЬ ВАЖНО: называем поле image, чтобы Prisma его поняла
+    image: rawImage ? rawImage.replace('http://', 'https://') : null,
     description: info.description || "",
-    realiseYear: info.publishedDate 
-      ? info.publishedDate.substring(0, 4) 
-      : (body.realiseYear ? String(body.realiseYear) : ""),
-    genresList: Array.isArray(info.categories) 
-      ? info.categories 
-      : (Array.isArray(body.genres) ? body.genres : []),
+    genresList: info.categories || info.genres || [],
+    realiseYear: info.publishedDate ? info.publishedDate.substring(0, 4) : (info.realiseYear || "0")
   };
 };

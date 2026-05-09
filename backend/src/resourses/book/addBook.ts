@@ -23,7 +23,9 @@ export const addBook = async (c: Context) => {
       where: { id: input.id },
       update: {
         bookName: input.title,
-        // ... остальные поля
+        image: input.image, // ДОБАВИТЬ ЭТО
+        realiseYear: input.realiseYear, // ДОБАВИТЬ ЭТО
+        description: input.description,
         userBooks: {
           connectOrCreate: {
             where: { userId_bookId: { userId, bookId: input.id } },
@@ -34,7 +36,9 @@ export const addBook = async (c: Context) => {
       create: {
         id: input.id,
         bookName: input.title,
-        // ... остальные поля
+        image: input.image, // ДОБАВИТЬ ЭТО
+        realiseYear: input.realiseYear, // ДОБАВИТЬ ЭТО
+        description: input.description,
         userBooks: {
           create: { userId: userId }
         },

@@ -1,59 +1,30 @@
 <script setup lang="ts">
-import type { BookDisplayData } from './types';
+import { computed } from 'vue'; 
 
-const props = defineProps<{
-  book: BookDisplayData;
-}>();
+const props = defineProps<{ book: any }>();
 
-// Утилита для корректного отображения автора (объект или строка)
-const getAuthorName = (author: any) => {
-  if (!author) return 'Автор неизвестен';
-  return typeof author === 'object' ? author.name : author;
-};
+const bookCover = computed(() => {
+
+  return props.book.image || props.book.cover || null;
+});
+
+const bookTitle = computed(() => {
+  return props.book.bookName || props.book.title || 'Без названия';
+});
 </script>
 
 <template>
   <router-link :to="`/book/${book.id}`" class="card-link">
-    <article class="book-card" role="button" tabindex="0">
+    <article class="book-card">
       <div class="book-card__image-container">
-        <img
-          v-if="book.cover || book.image"
-          :src="book.cover || book.image"
-          class="book-card__image"
-          loading="lazy"
-        />
+        <img v-if="bookCover" :src="bookCover" class="book-card__image" />
         <div v-else class="book-card__placeholder">
           <span>Нет обложки</span>
         </div>
-
-        <div
-          v-if="book.rating !== null && book.rating !== undefined"
-          class="book-card__rating-badge"
-        >
-          ⭐ {{ book.rating > 0 ? book.rating.toFixed(1) : '0' }}
-        </div>
-
-        <div class="book-card__hover-overlay">
-          <span class="view-more">Подробнее</span>
-        </div>
       </div>
-
+      
       <div class="book-card__content">
-        <h3 class="book-card__title">
-          {{ book.title || book.bookName || 'Без названия' }}
-        </h3>
-
-        <p class="book-card__author">
-          {{ getAuthorName(book.author) }}
-        </p>
-
-
-
-        <div class="book-card__footer">
-          <span class="book-card__year">
-            {{ book.year || book.realiseYear || '—' }}
-          </span>
-        </div>
+        <h3 class="book-card__title">{{ bookTitle }}</h3>
       </div>
     </article>
   </router-link>
