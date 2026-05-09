@@ -4,12 +4,22 @@ import { formatBook, formatExternalBook } from "../../utils/formatters";
 
 export const getBookById = async (c: Context) => {
   const id = c.req.param('id');
-  const apiKey = process.env.GOOGLE_BOOKS_API_KEY; // Наш новый ключ из .env
+  const payload = c.get('jwtPayload'); 
+  const apiKey = process.env.GOOGLE_BOOKS_API_KEY;
 
+  if (!id) {
+    return c.json({ error: 'ID книги не указан' }, 400);
+  }
   try {
-    // 1. Сначала ищем в своей БД
-    const book = await prisma.book.findUnique({
-      where: { id: id },
+    const book = await prisma.book.findFirst({
+      where: { 
+        id: id,
+        userBooks: {
+          some: {
+            userId: payload?.id 
+          }
+        }
+      },
       include: { author: true, genres: true }
     });
 
@@ -17,26 +27,16 @@ export const getBookById = async (c: Context) => {
       return c.json(formatBook(book));
     }
 
-    // 2. Если в базе нет, идем в Google Books
-    // URL для получения ОДНОЙ книги по ID
     const response = await fetch(
       `https://www.googleapis.com/books/v1/volumes/${id}?key=${apiKey}`
     );
 
     if (!response.ok) {
-      return c.json({ error: 'Книга не найдена во внешнем источнике' }, 404);
+      return c.json({ error: 'Книга не найдена' }, 404);
     }
 
     const externalData = await response.json();
 
-    // 3. Извлекаем данные (у Google всё лежит в объекте volumeInfo)
-    const info = externalData.volumeInfo;
-    
-    // Автор сразу здесь, массив строк. Берем первого или джойним.
-    const authorName = info.authors ? info.authors.join(", ") : "Неизвестный автор";
-
-    // 4. Возвращаем результат
-    // Важно: проверь, чтобы formatExternalBook принимал данные от Google
     return c.json(formatExternalBook(externalData));
 
   } catch (error: any) {

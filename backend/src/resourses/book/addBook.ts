@@ -3,10 +3,16 @@ import prisma from "../../lib/prisma";
 import { formatBook, prepareBookInput } from "../../utils/formatters";
 
 export const addBook = async (c: Context) => {
+  const payload = c.get('jwtPayload');
+  
+  if (!payload || !payload.id) {
+    return c.json({ error: 'Доступ запрещен' }, 401);
+  }
+
+  const userId = payload.id;
+
   try {
     const body = await c.req.json();
-    
-    // 1. Извлекаем данные
     const input = prepareBookInput(body);
 
     if (!input.id) {
@@ -17,22 +23,21 @@ export const addBook = async (c: Context) => {
       where: { id: input.id },
       update: {
         bookName: input.title,
-        image: input.image,
-        description: input.description,
-        realiseYear: input.realiseYear,
-        author: {
+        // ... остальные поля
+        userBooks: {
           connectOrCreate: {
-            where: { name: input.authorName },
-            create: { name: input.authorName }
+            where: { userId_bookId: { userId, bookId: input.id } },
+            create: { userId: userId }
           }
         }
       }, 
       create: {
         id: input.id,
         bookName: input.title,
-        image: input.image,
-        description: input.description,
-        realiseYear: input.realiseYear,
+        // ... остальные поля
+        userBooks: {
+          create: { userId: userId }
+        },
         author: {
           connectOrCreate: {
             where: { name: input.authorName },
@@ -50,15 +55,7 @@ export const addBook = async (c: Context) => {
     });
 
     return c.json({ success: true, data: formatBook(book) }, 201);
-
   } catch (error: any) {
-    console.error('Ошибка Prisma:', error.message);
-    if (error.meta) console.error('Детали ошибки:', error.meta);
-    
-    return c.json({ 
-      success: false, 
-      error: 'Ошибка при сохранении в базу данных', 
-      details: error.message 
-    }, 500);
+    return c.json({ success: false, error: 'Ошибка сервера при добавлении' }, 500);
   }
 };

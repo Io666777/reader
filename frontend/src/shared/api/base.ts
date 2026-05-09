@@ -1,22 +1,41 @@
+// frontend/src/shared/api/base.ts
+import { authStore } from '../store/auth'; // Проверь правильность пути к файлу auth.ts
+
 export const API_URL = 'http://localhost:3000/api';
 
-export async function apiRequest<T>(endpoint: string, options?: RequestInit): Promise<T>{
-   const headers: Record<string, string> = {
+export async function apiRequest<T>(endpoint: string, options?: RequestInit): Promise<T> {
+  const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-   }
+  };
 
-   if(options?.headers){
-    Object.assign(headers, options.headers)
-   }
+  // Достаем токен из стора (он там реактивный благодаря computed)
+  const token = authStore.token.value; 
 
-   const response = await fetch(`${API_URL}${endpoint}`, {
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  if (options?.headers) {
+    Object.assign(headers, options.headers);
+  }
+
+  console.log(`[apiRequest] To: ${endpoint}`, 'Headers:', headers);
+
+  const response = await fetch(`${API_URL}${endpoint}`, {
     ...options,
     headers: headers
-   })
+  });
 
-   if(!response.ok){
-    const errorData = await response.json().catch(()=>({}))
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    
+    // Если сервер вернул 401, значит токен протух — разлогиниваем
+    if (response.status === 401 && !endpoint.includes('/auth/')) {
+      authStore.logout();
+    }
+    
     throw new Error(errorData.error || `Ошибка сервера: ${response.status}`);
-   }
-   return response.json();
+  }
+  
+  return response.json();
 }

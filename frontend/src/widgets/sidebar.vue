@@ -1,3 +1,13 @@
+<script setup lang="ts">
+import { authStore } from '../shared/store/auth';
+
+// Получаем инициалы для аватарки (например, Dmitry -> D)
+const getInitials = (name: string) => {
+  return name ? name.charAt(0).toUpperCase() : 'U';
+};
+
+</script>
+
 <template>
   <aside class="sidebar">
     <div class="sidebar__logo">
@@ -14,24 +24,41 @@
         <span class="nav-item__icon">🔍</span>
         Поиск книг
       </router-link>
-      <a href="#" class="nav-item">
-        <span class="nav-item__icon">📑</span>
-        Закладки
-      </a>
     </nav>
 
-    <div class="sidebar__footer">
+    <div class="sidebar__footer" v-if="authStore.isAuth.value">
       <div class="user-profile">
-        <div class="user-avatar">KF</div>
+        <div class="user-avatar">
+          {{ getInitials(authStore.user.value?.username) }}
+        </div>
         <div class="user-info">
-          <span class="user-name">KalinkinFiz</span>
+          <span class="user-name">{{
+            authStore.user.value?.username || 'Пользователь'
+          }}</span>
           <span class="user-status">Online</span>
         </div>
+        <button @click="authStore.logout()" class="logout-btn">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="9" y1="12" x2="15" y2="12"></line>
+            <polyline points="12 9 15 12 12 15"></polyline>
+          </svg>
+        
+        </button>
       </div>
     </div>
   </aside>
 </template>
-
 <style scoped lang="sass">
 $sidebar-width: 260px
 $accent-color: #2196f3
@@ -91,12 +118,12 @@ $text-main: #2c3e50
   &__footer
     padding: 20px
     border-top: 1px solid #eee
-    
+
     .user-profile
       display: flex
       align-items: center
       gap: 12px
-      
+
       .user-avatar
         width: 36px
         height: 36px
@@ -112,13 +139,82 @@ $text-main: #2c3e50
       .user-info
         display: flex
         flex-direction: column
-        
+
         .user-name
           font-size: 14px
           font-weight: 600
           color: $text-main
-          
+
         .user-status
           font-size: 11px
           color: #4caf50
+  // ... существующие стили ...
+
+.sidebar__footer
+  padding: 20px
+  border-top: 1px solid #eee
+
+  .user-profile
+    display: flex
+    align-items: center
+    gap: 12px
+    position: relative // для позиционирования кнопки выхода
+
+    .user-avatar
+      min-width: 36px // фиксируем ширину, чтобы не сжималась
+      height: 36px
+      background: #f0f2f5
+      border-radius: 10px
+      display: flex
+      align-items: center
+      justify-content: center
+      font-weight: 600
+      font-size: 14px
+      color: $accent-color
+
+    .user-info
+      display: flex
+      flex-direction: column
+      flex: 1 // занимает всё свободное место
+      overflow: hidden // чтобы длинные имена не ломали верстку
+
+      .user-name
+        font-size: 14px
+        font-weight: 600
+        color: $text-main
+        white-space: nowrap
+        text-overflow: ellipsis
+        overflow: hidden
+
+      .user-status
+        font-size: 11px
+        color: #4caf50
+
+    .logout-btn
+      background: none
+      border: none
+      cursor: pointer
+      padding: 5px
+      font-size: 16px
+      opacity: 0.5
+      transition: opacity 0.2s
+
+      &:hover
+        opacity: 1
+.logout-btn
+  display: flex
+  align-items: center
+  gap: 8px
+  background: none
+  border: none
+  color: #888
+  cursor: pointer
+  transition: color 0.2s
+  padding: 8px
+
+  &:hover
+    color: #2196f3 // Иконка поменяет цвет вместе с текстом благодаря stroke="currentColor"
+
+  svg
+    flex-shrink: 0
 </style>

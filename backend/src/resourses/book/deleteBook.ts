@@ -1,16 +1,27 @@
 import type { Context } from "hono";
 import prisma from "../../lib/prisma";
 
+export const deleteBook = async (c: Context) => {
+  const bookId = c.req.param('id');
+  const payload = c.get('jwtPayload');
 
-export const deleteBook = async(c:Context)=>{
-    const id = c.req.param('id');
-    try{
-        await prisma.book.delete({
-            where:{id:id}
-        });
+  if (!payload || !payload.id || !bookId) {
+    return c.json({ error: 'Недостаточно данных для удаления' }, 400);
+  }
 
-        return c.json({message: 'book deleted'}, 200);
-    }catch(error){
-        return c.json({error: 'book not deleted'},404)
-    }
-}
+  try {
+    // Удаляем связь, а не саму книгу!
+    await prisma.userBook.delete({
+      where: {
+        userId_bookId: {
+          userId: payload.id,
+          bookId: bookId
+        }
+      }
+    });
+
+    return c.json({ message: 'Книга убрана с вашей полки' }, 200);
+  } catch (error) {
+    return c.json({ error: 'Книга не найдена на вашей полке' }, 404);
+  }
+};

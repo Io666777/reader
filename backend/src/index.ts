@@ -6,9 +6,10 @@ import { trimTrailingSlash } from "hono/trailing-slash";
 
 import bookRoute from './resourses/route'
 import authRoute from './resourses/authRoute'
+import { authenticate } from "./utils/middleware";
 
 type Variables = {
-  userId: string
+  jwtPayload: { id: string }
 }
 
 const app = new Hono<{ Variables: Variables }>()
@@ -16,8 +17,9 @@ const app = new Hono<{ Variables: Variables }>()
 app.use('*', cors())
 app.use('*', trimTrailingSlash())
 
-app.route('/api/books', bookRoute)
 app.route('/api/auth', authRoute)
+app.use('/api/books/*', authenticate)
+app.route('/api/books', bookRoute)
 
 
 app.get('/', (c) => {
