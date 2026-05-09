@@ -5,23 +5,19 @@ import { authStore } from '../shared/store/auth';
 const getInitials = (name: string) => {
   return name ? name.charAt(0).toUpperCase() : 'U';
 };
-
 </script>
 
 <template>
   <aside class="sidebar">
     <div class="sidebar__logo">
-      <span class="logo-icon">📚</span>
       <h1 class="logo-text">Reader</h1>
     </div>
 
     <nav class="sidebar__nav">
       <router-link to="/" class="nav-item" active-class="active">
-        <span class="nav-item__icon">🏠</span>
         <span class="nav-item__text">Моя полка</span>
       </router-link>
       <router-link to="/catalog" class="nav-item" active-class="active">
-        <span class="nav-item__icon">🔍</span>
         <span class="nav-item__text">Поиск книг</span>
       </router-link>
     </nav>
@@ -84,10 +80,10 @@ $bg-hover: rgba(33, 150, 243, 0.08)
     display: flex
     align-items: center
     gap: 12px
-    
+
     .logo-icon
       font-size: 26px
-    
+
     .logo-text
       font-size: 22px
       font-weight: 800
@@ -118,7 +114,7 @@ $bg-hover: rgba(33, 150, 243, 0.08)
 
       &:hover
         background-color: $bg-hover
-      &.active  
+      &.active
         .nav-item__icon
           filter: brightness(1.2)
 
@@ -166,7 +162,7 @@ $bg-hover: rgba(33, 150, 243, 0.08)
           display: flex
           align-items: center
           gap: 4px
-          
+
           &::before
             content: ''
             width: 6px

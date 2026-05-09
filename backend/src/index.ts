@@ -13,6 +13,7 @@ type Variables = {
 }
 
 const app = new Hono<{ Variables: Variables }>()
+const port = Number(process.env.PORT) || 16000;
 
 app.use('*', cors())
 app.use('*', trimTrailingSlash())
@@ -28,7 +29,7 @@ app.get('/', (c) => {
 
 serve({
   fetch: app.fetch,
-  port: 3000
+  port: port
 }, (info) => {
   console.log(`Server is running on http://localhost:${info.port}`)
 })

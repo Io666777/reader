@@ -1,7 +1,7 @@
 // frontend/src/shared/api/base.ts
 import { authStore } from '../store/auth'; // Проверь правильность пути к файлу auth.ts
 
-export const API_URL = 'http://localhost:3000/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
 export async function apiRequest<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const headers: Record<string, string> = {
