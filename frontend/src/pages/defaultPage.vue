@@ -5,12 +5,9 @@ import sidebar from '../widgets/sidebar.vue';
 <template>
   <div class="layout">
     <sidebar />
-
-    <div class="layout__container">
-      <main class="main-content">
-        <router-view />
-      </main>
-    </div>
+    <main class="main-content">
+      <router-view />
+    </main>
   </div>
 </template>
 
@@ -23,33 +20,18 @@ $bg-color: #fdfdfd
   min-height: 100vh
   background-color: $bg-color
 
-  &__container
-    flex: 1
-    margin-left: $sidebar-width
-    display: flex
-    flex-direction: column
+.main-content
+  flex: 1
+  margin-left: $sidebar-width
+  padding: 30px 40px
+  transition: all 0.3s ease
 
-  .header
-    height: 80px
-    padding: 0 40px
-    display: flex
-    align-items: center
-    justify-content: space-between
-    background: rgba($bg-color, 0.9)
-    backdrop-filter: blur(10px)
-    position: sticky
-    top: 0
-    z-index: 50
-
-    &__search
-      flex: 1
-      max-width: 500px
-
-    &__actions
-      display: flex
-      align-items: center
-      gap: 12px
-
+@media (max-width: 1024px)
   .main-content
-    padding: 20px 40px
+    padding: 20px 24px
+
+@media (max-width: 768px)
+  .main-content
+    margin-left: 0
+    padding: 16px 16px 90px 16px // Большой нижний отступ для мобильного меню
 </style>

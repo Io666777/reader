@@ -110,7 +110,7 @@ const handleSubmit = async () => {
 
 <style scoped lang="sass">
 $accent: #2196f3
-$bg: #f5f7f9
+
 $text: #2c3e50
 
 .auth-page
@@ -118,7 +118,7 @@ $text: #2c3e50
   justify-content: center
   align-items: center
   min-height: 100vh
-  background-color: $bg
+
   padding: 20px
 
 .auth-card

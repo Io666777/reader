@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { authStore } from '../shared/store/auth';
 
-// Получаем инициалы для аватарки (например, Dmitry -> D)
 const getInitials = (name: string) => {
   return name ? name.charAt(0).toUpperCase() : 'U';
 };
@@ -28,9 +27,9 @@ const getInitials = (name: string) => {
           {{ getInitials(authStore.user.value?.username) }}
         </div>
         <div class="user-info">
-          <span class="user-name">
-            {{ authStore.user.value?.username || 'Пользователь' }}
-          </span>
+          <span class="user-name">{{
+            authStore.user.value?.username || 'Пользователь'
+          }}</span>
           <span class="user-status">Online</span>
         </div>
         <button @click="authStore.logout()" class="logout-btn" title="Выйти">
@@ -56,13 +55,15 @@ const getInitials = (name: string) => {
 </template>
 
 <style scoped lang="sass">
-// Переменные
 $sidebar-width: 260px
 
 $text-dark: #2c3e50
 $text-gray: #666
 $bg-hover: rgba(33, 150, 243, 0.08)
 
+.logout-btn
+  border: none 
+  background-color: none
 .sidebar
   width: $sidebar-width
   height: 100vh
@@ -74,22 +75,17 @@ $bg-hover: rgba(33, 150, 243, 0.08)
   left: 0
   top: 0
   z-index: 100
+  transition: all 0.3s ease
 
   &__logo
     padding: 32px 24px
     display: flex
     align-items: center
     gap: 12px
-
-    .logo-icon
-      font-size: 26px
-
     .logo-text
       font-size: 22px
       font-weight: 800
       color: $text-dark
-      letter-spacing: -0.5px
-      margin: 0
 
   &__nav
     flex: 1
@@ -97,7 +93,6 @@ $bg-hover: rgba(33, 150, 243, 0.08)
     display: flex
     flex-direction: column
     gap: 4px
-
     .nav-item
       display: flex
       align-items: center
@@ -109,19 +104,9 @@ $bg-hover: rgba(33, 150, 243, 0.08)
       transition: all 0.2s ease
       font-weight: 500
 
-      &__icon
-        font-size: 18px
-
-      &:hover
-        background-color: $bg-hover
-      &.active
-        .nav-item__icon
-          filter: brightness(1.2)
-
   &__footer
     padding: 20px 16px
     border-top: 1px solid #f5f5f5
-
     .user-profile
       display: flex
       align-items: center
@@ -130,58 +115,32 @@ $bg-hover: rgba(33, 150, 243, 0.08)
       background: #fafafa
       border-radius: 16px
 
-      .user-avatar
-        min-width: 40px
-        height: 40px
-        background: #e3f2fd
-        border-radius: 12px
-        display: flex
-        align-items: center
-        justify-content: center
-        font-weight: 700
-        font-size: 14px
+@media (max-width: 768px)
+  .sidebar
+    width: 100%
+    height: 70px
+    flex-direction: row
+    top: auto
+    bottom: 0
+    border-right: none
+    border-top: 1px solid #f0f0f0
+    padding: 0
 
-      .user-info
-        display: flex
-        flex-direction: column
+    &__logo, &__footer
+      display: none
+
+    &__nav
+      flex-direction: row
+      padding: 0
+      gap: 0
+      .nav-item
         flex: 1
-        overflow: hidden
-
-        .user-name
-          font-size: 14px
-          font-weight: 700
-          color: $text-dark
-          white-space: nowrap
-          overflow: hidden
-          text-overflow: ellipsis
-
-        .user-status
-          font-size: 11px
-          color: #4caf50
-          font-weight: 500
-          display: flex
-          align-items: center
-          gap: 4px
-
-          &::before
-            content: ''
-            width: 6px
-            height: 6px
-            background: #4caf50
-            border-radius: 50%
-
-      .logout-btn
-        background: none
-        border: none
-        padding: 8px
-        color: #b0bec5
-        cursor: pointer
-        transition: all 0.2s
-        display: flex
-        align-items: center
-        border-radius: 8px
-
-        &:hover
-          color: #ff5252
-          background: rgba(255, 82, 82, 0.1)
+        flex-direction: column
+        justify-content: center
+        border-radius: 0
+        gap: 4px
+        font-size: 11px
+        &.active
+          box-shadow: none
+          background: none
 </style>

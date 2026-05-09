@@ -56,12 +56,15 @@ const displayedBooks = computed(() => {
       </div>
 
       <div class="books-grid">
-        <catalogBookCard v-for="item in displayedBooks" :key="item.id" :book="item" />
+        <catalogBookCard
+          v-for="item in displayedBooks"
+          :key="item.id"
+          :book="item"
+        />
       </div>
     </template>
 
-    <div v-else class="auth-promo">
-      </div>
+    <div v-else class="auth-promo"></div>
   </div>
 </template>
 
@@ -87,6 +90,15 @@ const displayedBooks = computed(() => {
   gap: 32px 24px
   padding-top: 10px // Небольшой отступ от тулбара
 
-.auth-promo
-  // ... твои стили без изменений ...
+@media (max-width: 600px)
+  .books-grid
+    // На мобилках ставим строго 2 колонки
+    grid-template-columns: repeat(2, 1fr)
+    gap: 16px
+    padding: 16px
+
+@media (max-width: 400px)
+  .books-grid
+    gap: 12px
+    padding: 12px
 </style>

@@ -114,4 +114,17 @@ onMounted(async () => {
   margin-top: 50px
   font-size: 1.1rem
   text-align: center
+
+
+@media (max-width: 600px)
+  .books-grid
+    // На мобилках ставим строго 2 колонки
+    grid-template-columns: repeat(2, 1fr) 
+    gap: 16px
+    padding: 16px
+
+@media (max-width: 400px)
+  .books-grid
+    gap: 12px
+    padding: 12px
 </style>
