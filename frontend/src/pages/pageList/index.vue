@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import bookSerch from '../../widgets/bookSerch/index.vue';
 import filterForBook from '../../widgets/bookFilter/index.vue';
+import profileButton from '../../widgets/loginButton/index.vue'
 import catalogBookCard from '../../entities/book/catalogBookCard.vue';
 import type { BookDisplayData } from '../../entities/book/types';
 import { computed, onMounted, ref } from 'vue';
@@ -53,6 +54,7 @@ const displayedBooks = computed(() => {
       <div class="toolbar">
         <filterForBook mode="local" @applyFilters="handleFilters" />
         <bookSerch mode="local" @update:books="handleSearchUpdate" />
+        <profileButton/>
       </div>
 
       <div class="books-grid">

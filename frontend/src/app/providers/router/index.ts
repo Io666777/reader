@@ -3,6 +3,7 @@ import {authStore} from '../../../shared/store/auth'
 import pageCatalog from '../../../pages/pageCatalog/index.vue'
 import pageList from '../../../pages/pageList/index.vue'
 import pageLogin from '../../../pages/pageLogin/index.vue' 
+import profilPage from '../../../pages/profilPage/index.vue'
 import defaultPage from '../../../pages/defaultPage.vue'
 
 const routes = [
@@ -26,11 +27,16 @@ const routes = [
         component: () => import('../../../pages/bookDetalsPage/index.vue')
       },
       {
-        path: '/login',
+        path: 'login',
         name: 'login',
         component: pageLogin,
         meta: { guestOnly: true }
-  }
+      },
+      {
+        path: 'profil',
+        name: 'profil',
+        component: profilPage,
+      },
     ]
   }, 
   
