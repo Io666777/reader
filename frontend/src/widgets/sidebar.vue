@@ -1,5 +1,16 @@
+<script setup lang="ts">
+import { computed } from "vue";
+import { useRoute } from "vue-router";
+
+const route = useRoute();
+
+const isAuthPage = computed(() => {
+  return ["/login", "/register"].includes(route.path);
+});
+</script>
+
 <template>
-  <aside class="sidebar">
+  <aside class="sidebar" :class="{ 'sidebar--hidden-mobile': isAuthPage }">
     <div class="sidebar__logo">
       <h1 class="logo-text">Reader</h1>
     </div>
@@ -23,7 +34,7 @@ $text-gray: #666
 $bg-hover: rgba(33, 150, 243, 0.08)
 
 .logout-btn
-  border: none 
+  border: none
   background-color: none
 .sidebar
   width: $sidebar-width
@@ -77,6 +88,9 @@ $bg-hover: rgba(33, 150, 243, 0.08)
       border-radius: 16px
 
 @media (max-width: 768px)
+  .sidebar--hidden-mobile
+    display: none !important
+
   .sidebar
     width: 100%
     height: 70px
