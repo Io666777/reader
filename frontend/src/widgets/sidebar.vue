@@ -1,11 +1,3 @@
-<script setup lang="ts">
-import { authStore } from '../shared/store/auth';
-
-const getInitials = (name: string) => {
-  return name ? name.charAt(0).toUpperCase() : 'U';
-};
-</script>
-
 <template>
   <aside class="sidebar">
     <div class="sidebar__logo">
