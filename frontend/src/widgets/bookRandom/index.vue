@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import router from '../../app/providers/router';
+import { useRouter } from 'vue-router'; 
 import contentButton from '../../shared/ui/contentButton.vue';
 import { getRandom } from './api/get-random-book';
+
+const router = useRouter();
 
 const randomClick = async () => {
   try {
@@ -9,12 +11,17 @@ const randomClick = async () => {
     const book = response?.book;
 
     if (book && book.id) {
-      router.push({ name: 'bookDetals', params: { id: book.id } });
+      console.log('Перехожу на книгу:', book.id);
+
+      await router.push({ 
+        name: 'bookDetals', 
+        params: { id: book.id } 
+      });
     } else {
-      console.warn('Метаданные поиска:', response?.metadata);
+      console.warn('ID книги не найден:', book);
     }
   } catch (error) {
-    console.error('Хаос не удался:', error);
+    console.error('Ошибка навигации:', error);
   }
 };
 </script>

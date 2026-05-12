@@ -42,10 +42,8 @@ const handleAction = async () => {
     } else {
       await addBook(book.value);
       book.value.isExternal = false;
-      alert('Книга добавлена!');
     }
   } catch (error: any) {
-    alert(error.message || 'Произошла ошибка');
   } finally {
     isProcessing.value = false;
   }
