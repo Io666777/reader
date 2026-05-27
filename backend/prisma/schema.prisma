@@ -6,52 +6,34 @@ datasource db {
   provider = "postgresql"
 }
 
-model Book {
-  id          String   @id @default(uuid())
-  isbn        String?   @unique
-  bookName    String?
-  image       String?
-  realiseYear String?
-  authorId    String
-  author      Author   @relation(fields: [authorId], references: [id])
-  createdAt   DateTime @default(now())
-  description String?
-  rating      Float?   @default(0)
+model User {
+  id       String @id @default(uuid())
+  email    String @unique
+  password String
 
-  genres    Genre[]
-  userBooks UserBook[]
+  folders Folder[]
+  books   Book[]
 }
 
-model Genre {
-  id   String @id @default(uuid())
-  name String @unique
+model Folder {
+  id        String   @id @default(uuid())
+  name      String
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   books Book[]
 }
 
-model Author {
-  id        String   @id @default(uuid())
-  name      String   @unique
-  books     Book[]
-  createdAt DateTime @default(now())
-}
+model Book {
+  id          String   @id @default(uuid())
+  title       String?
+  author      String?
+  description String?
+  image       String?
+  createdAt   DateTime @default(now())
 
-model User {
-  id        String     @id @default(uuid())
-  email     String     @unique
-  username  String     
-  password  String
-  createdAt DateTime   @default(now())
-  userBooks UserBook[]
-}
-
-model UserBook {
-  id     String @id @default(uuid())
-  userId String
-  bookId String
-
-  user User @relation(fields: [userId], references: [id])
-  book Book @relation(fields: [bookId], references: [id])
-
-  @@unique([userId, bookId])
+  folders Folder[]
+  users    User[]
 }
