@@ -1,4 +1,3 @@
-// src/modules/folder/folder.controller.ts
 import type { Context } from 'hono';
 import prisma from '../../lib/prisma';
 
