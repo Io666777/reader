@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import type { Book } from "../model/types";
+import BaseButton from "@/shared/ui/BaseButton.vue";
 
 defineProps<{ book: Book }>();
-
 const isExpanded = ref(false);
+const emit = defineEmits(['view-activity', 'delete']);
 </script>
 
 <template>
@@ -21,9 +22,12 @@ const isExpanded = ref(false);
 
     <Transition name="fade">
       <div v-if="isExpanded" class="details-panel">
-        <button class="action-btn">Посмотреть активности</button>
-        <button class="action-btn">Посмотреть активности</button>
-        <button class="action-btn del">удалить книгу</button>
+        <BaseButton variant="action" @click="emit('view-activity', book.id)">
+          Посмотреть активности
+        </BaseButton>
+        <BaseButton variant="danger" @click="emit('delete', book.id)">
+          Удалить книгу
+        </BaseButton>
       </div>
     </Transition>
   </div>
@@ -98,10 +102,4 @@ const isExpanded = ref(false);
   &:hover
     opacity: 0.8
 
-.fade-enter-active, .fade-leave-active
-  transition: opacity 0.2s, transform 0.2s
-
-.fade-enter-from, .fade-leave-to
-  opacity: 0
-  transform: translateY(-5px)
 </style>

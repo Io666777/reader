@@ -1,4 +1,5 @@
 export interface Folder {
+  title: any
   id: string
   name: string
   createdAt: number

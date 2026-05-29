@@ -50,12 +50,4 @@ const isOpen = ref(false)
   border-left: 2px solid #e2e8f0
   margin-top: 8px
   overflow: hidden
-
-.slide-enter-active, .slide-leave-active
-  transition: all 0.3s ease-out
-  max-height: 500px 
-
-.slide-enter-from, .slide-leave-to
-  max-height: 0
-  opacity: 0
 </style>

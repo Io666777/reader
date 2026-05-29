@@ -2,7 +2,7 @@ import type { Book, Folder } from './types'
 
 export const MOCK_FOLDERS: Folder[] = [
   { id: 'f1', name: 'Художественная литература', createdAt: Date.now() },
-  { id: 'f2', name: 'Техническая документация', createdAt: Date.now() }
+  { id: 'f2', name: 'Техническая документация', createdAt: Date.now() },
 ]
 
 export const MOCK_BOOKS: Book[] = [
