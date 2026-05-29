@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import { useAuth } from '@clerk/vue'
+import { watch } from 'vue'
 
 const routes: RouteRecordRaw[] = [
   {
@@ -23,14 +24,13 @@ const routes: RouteRecordRaw[] = [
     path: '/auth',
     name: 'auth',
     component: () => import('../../../pages/auth/ui/AuthPage.vue'),
-    meta: { requiresAuth: false },
-    children: [
-      {
-        path: 'sign-up',
-        name: 'register',
-        component: () => import('../../../pages/auth/ui/AuthPage.vue') // Используем ту же подложку страницы
-      }
-    ]
+    meta: { requiresAuth: false }
+  },
+  {
+    path: '/auth/sign-up',
+    name: 'register',
+    component: () => import('../../../pages/auth/ui/AuthPage.vue'),
+    meta: { requiresAuth: false }
   }
 ]
 
@@ -40,7 +40,22 @@ export const router = createRouter({
 })
 
 router.beforeEach(async (to) => {
-  const { isSignedIn } = useAuth()
+  const { isSignedIn, isLoaded } = useAuth()
+
+  if (!isLoaded.value) {
+    await new Promise<void>((resolve) => {
+      const stopWatch = watch(
+        () => isLoaded.value,
+        (loaded) => {
+          if (loaded) {
+            stopWatch()
+            resolve()
+          }
+        },
+        { immediate: true }
+      )
+    })
+  }
 
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
 
@@ -48,7 +63,7 @@ router.beforeEach(async (to) => {
     return { name: 'auth' }
   }
 
-  if (to.name === 'auth' && isSignedIn.value) {
+  if ((to.name === 'auth' || to.name === 'register') && isSignedIn.value) {
     return { name: 'home' }
   }
 })
