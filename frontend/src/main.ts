@@ -1,7 +1,7 @@
 import { createApp } from 'vue'
 import { clerkPlugin } from '@clerk/vue'
 import App from './app/App.vue'
-import router from './app/providers/router/index'
+import {router} from './app/providers/router/index'
 
 const app = createApp(App)
 

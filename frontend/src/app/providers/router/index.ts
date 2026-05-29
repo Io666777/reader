@@ -1,64 +1,47 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import {authStore} from '../../../shared/store/auth'
-import pageCatalog from '../../../pages/pageCatalog/index.vue'
-import pageList from '../../../pages/pageList/index.vue'
-import pageLogin from '../../../pages/pageLogin/index.vue' 
-import profilPage from '../../../pages/profilPage/index.vue'
-import defaultPage from '../../../pages/defaultPage.vue'
+import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
+import { useAuth } from '@clerk/vue'
 
-const routes = [
+const routes: RouteRecordRaw[] = [
   {
     path: '/',
-    component: defaultPage,
+    component: () => import('../../../pages/MainLayout.vue'),
+    meta: { requiresAuth: true },
     children: [
       {
         path: '',
         name: 'home',
-        component: pageList,
+        component: () => import('../../../pages/home/ui/HomePage.vue')
       },
       {
-        path: 'catalog',
-        name: 'catalog',
-        component: pageCatalog,
-      },
-      {
-        path: 'book/:id',
-        name: 'bookDetals',
-        component: () => import('../../../pages/bookDetalsPage/index.vue')
-      },
-      {
-        path: 'login',
-        name: 'login',
-        component: pageLogin,
-        meta: { guestOnly: true }
-      },
-      {
-        path: 'profil',
-        name: 'profil',
-        component: profilPage,
-      },
+        path: 'activity',
+        name: 'activity',
+        component: () => import('../../../pages/activity/ui/ActivityPage.vue')
+      }
     ]
-  }, 
-  
+  },
+  {
+    path: '/auth',
+    name: 'auth',
+    component: () => import('../../../pages/auth/ui/AuthPage.vue'),
+    meta: { requiresAuth: false }
+  }
 ]
 
-const router = createRouter({
+export const router = createRouter({
   history: createWebHistory(),
   routes
 })
 
-router.beforeEach((to, _from, next) => {
-  const isAuth = authStore.isAuth.value
+router.beforeEach(async (to) => {
+  const { isSignedIn } = useAuth()
 
-  if (to.meta.requiresAuth && !isAuth) {
-    return next({ name: 'login' })
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
+
+  if (requiresAuth && !isSignedIn.value) {
+    return { name: 'auth' }
   }
 
-  if (to.meta.guestOnly && isAuth) {
-    return next({ name: 'home' })
+  if (to.name === 'auth' && isSignedIn.value) {
+    return { name: 'home' }
   }
-
-  next()
 })
-
-export default router
