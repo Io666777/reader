@@ -5,13 +5,17 @@ import { RouterLink } from "vue-router";
 <template>
   <nav class="menu">
     <RouterLink to="/" class="menu-item" :exact-active-class="'active'">
-      <span>Главная</span>
+      <span>Полка</span>
     </RouterLink>
 
     <RouterLink to="/activity" class="menu-item" :exact-active-class="'active'">
       <span>Активность</span>
     </RouterLink>
   </nav>
+
+  <main class="content">
+    <RouterView />
+  </main>
 </template>
 
 <style scoped lang="sass">
@@ -36,11 +40,9 @@ import { RouterLink } from "vue-router";
   padding: 12px 0 20px 0
   background: none
   border: none
-  
-  color: #94a3b8 
+
+  color: #94a3b8
   transition: color 0.2s ease
-
-
 
   span
     font-size: 14px
@@ -51,7 +53,7 @@ import { RouterLink } from "vue-router";
     color: #64748b
 
   &.active
-    color: #000000 
+    color: #000000
 
     &::after
       content: ''
@@ -63,4 +65,9 @@ import { RouterLink } from "vue-router";
       height: 3px // Толщина линии
       background-color: #000000
       border-radius: 2px
+      
+.content
+  flex: 1
+  width: 100%
+  padding: 20px
 </style>
