@@ -11,7 +11,6 @@ export interface Book {
   fileUrl: string
   fileType: 'fb2' | 'docx' | 'txt'
   fileSize?: string
-  progress: number
   folderId: string | null
   createdAt: number
 }

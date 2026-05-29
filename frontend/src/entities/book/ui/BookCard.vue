@@ -1,42 +1,48 @@
 <script setup lang="ts">
-import type { Book } from '../model/types'
+import { ref } from "vue";
+import type { Book } from "../model/types";
 
-defineProps<{
-  book: Book
-}>()
+defineProps<{ book: Book }>();
+
+const isExpanded = ref(false);
 </script>
 
 <template>
-  <div class="book-card">
-    <div class="meta-side">
-      <span class="file-badge">{{ book.fileType.toUpperCase() }}</span>
-      <div class="titles">
-        <h4 class="title">{{ book.title }}</h4>
-        <p class="author">{{ book.author }}</p>
+  <div class="book-card" :class="{ expanded: isExpanded }">
+    <div class="main-row" @click="isExpanded = !isExpanded">
+      <div class="meta-side">
+        <span class="file-badge">{{ book.fileType.toUpperCase() }}</span>
+        <div class="titles">
+          <h4 class="title">{{ book.title }}</h4>
+          <p class="author">{{ book.author }}</p>
+        </div>
       </div>
     </div>
 
-    <div class="progress-side">
-      <span class="percentage">Прогресс: {{ book.progress }}%</span>
-      <div class="bar">
-        <div class="fill" :style="{ width: book.progress + '%' }"></div>
+    <Transition name="fade">
+      <div v-if="isExpanded" class="details-panel">
+        <button class="action-btn">Посмотреть активности</button>
+        <button class="action-btn primary">Посмотреть активности</button>
       </div>
-    </div>
+    </Transition>
   </div>
 </template>
 
 <style scoped lang="sass">
 .book-card
+  border-bottom: 1px solid #e2e8f0
+  overflow: hidden
+  transition: all 0.3s ease
+
+  &.expanded
+    background-color: #f8fafc
+
+.main-row
   display: flex
   align-items: center
-  justify-content: space-between
-  padding: 14px 20px
-  border-bottom: 1px solid #e2e8f0
-  background: none
-  transition: background-color 0.15s ease
-
-  &:hover
-    background-color: #f8fafc
+  padding: 16px 20px
+  cursor: pointer
+  width: 100%
 
 .meta-side
   display: flex
@@ -66,26 +72,33 @@ defineProps<{
   color: #94a3b8
   margin: 2px 0 0 0
 
-.progress-side
+.details-panel
+  padding: 0 20px 16px 60px // Сместили кнопки чуть правее для визуального баланса
   display: flex
-  flex-direction: column
-  align-items: flex-end
-  gap: 6px
-  min-width: 120px
+  gap: 10px
 
-.percentage
+.action-btn
+  padding: 8px 16px
+  border-radius: 8px
+  border: 1px solid #e2e8f0
+  background: #f9fafb
   font-size: 12px
-  font-weight: 500
-  color: #64748b
+  font-weight: 600
+  cursor: pointer
+  transition: all 0.2s
 
-.bar
-  width: 100%
-  height: 4px
-  background-color: #f1f5f9
-  border-radius: 2px
-  overflow: hidden
+  &.primary
+    background: #f9fafb
+    color: #black
+    border: 1px solid #e2e8f0
 
-.fill
-  height: 100%
-  background-color: #000000 // Линия прогресса черная, как активная вкладка навбара
+  &:hover
+    opacity: 0.8
+
+.fade-enter-active, .fade-leave-active
+  transition: opacity 0.2s, transform 0.2s
+
+.fade-enter-from, .fade-leave-to
+  opacity: 0
+  transform: translateY(-5px)
 </style>

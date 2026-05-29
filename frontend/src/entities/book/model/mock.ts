@@ -13,7 +13,6 @@ export const MOCK_BOOKS: Book[] = [
     fileUrl: '',
     fileType: 'fb2',
     fileSize: '840 KB',
-    progress: 34,
     folderId: 'f1', // лежит в папке "Художественная литература"
     createdAt: Date.now()
   },
@@ -24,7 +23,6 @@ export const MOCK_BOOKS: Book[] = [
     fileUrl: '',
     fileType: 'docx',
     fileSize: '2.4 MB',
-    progress: 0,
     folderId: 'f2', // лежит в папке "Техническая документация"
     createdAt: Date.now()
   },
@@ -35,7 +33,6 @@ export const MOCK_BOOKS: Book[] = [
     fileUrl: '',
     fileType: 'txt',
     fileSize: '12 KB',
-    progress: 90,
     folderId: null, // без папки
     createdAt: Date.now()
   }
