@@ -22,7 +22,8 @@ const isExpanded = ref(false);
     <Transition name="fade">
       <div v-if="isExpanded" class="details-panel">
         <button class="action-btn">Посмотреть активности</button>
-        <button class="action-btn primary">Посмотреть активности</button>
+        <button class="action-btn">Посмотреть активности</button>
+        <button class="action-btn del">удалить книгу</button>
       </div>
     </Transition>
   </div>
@@ -73,9 +74,10 @@ const isExpanded = ref(false);
   margin: 2px 0 0 0
 
 .details-panel
-  padding: 0 20px 16px 60px // Сместили кнопки чуть правее для визуального баланса
+  padding: 0 20px 16px 60px 
   display: flex
   gap: 10px
+  width: 100%
 
 .action-btn
   padding: 8px 16px
@@ -87,10 +89,11 @@ const isExpanded = ref(false);
   cursor: pointer
   transition: all 0.2s
 
-  &.primary
+  &.del
     background: #f9fafb
     color: #black
     border: 1px solid #e2e8f0
+    margin-left: auto
 
   &:hover
     opacity: 0.8
