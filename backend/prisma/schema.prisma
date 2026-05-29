@@ -7,10 +7,11 @@ datasource db {
 }
 
 model User {
-  id       String @id @default(uuid())
-  email    String @unique
-  password String
-
+  id        String   @id
+  email     String   @unique
+  username  String?
+  createdAt DateTime @default(now())
+  
   folders Folder[]
   books   Book[]
 }
@@ -35,5 +36,5 @@ model Book {
   createdAt   DateTime @default(now())
 
   folders Folder[]
-  users    User[]
+  users   User[]
 }
