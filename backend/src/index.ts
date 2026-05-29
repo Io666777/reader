@@ -3,6 +3,10 @@ import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
 import{ cors } from 'hono/cors'
 import { trimTrailingSlash } from "hono/trailing-slash";
+import { clerkMiddleware } from '@clerk/hono';
+import bookRoute from './modules/book/book.routes';
+import folderRouter from "./modules/book/book.routes";
+import { clerkAuthMiddleware } from "./middleware/auth";
 
 type Variables = {
   jwtPayload: { id: string }
@@ -13,6 +17,14 @@ const port = Number(process.env.PORT) || 16000;
 
 app.use('*', cors())
 app.use('*', trimTrailingSlash())
+
+app.use('*', clerkMiddleware());
+
+app.use('/api/books/*', clerkAuthMiddleware());
+app.route('/api/books', bookRoute);
+
+app.use('/api/folders/*', clerkAuthMiddleware())
+app.route('/api/folder', folderRouter)
 
 app.get('/', (c) => {
   return c.text('Hello Honods!')
