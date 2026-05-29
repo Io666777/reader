@@ -2,6 +2,7 @@ import { createApp } from 'vue'
 import { clerkPlugin } from '@clerk/vue'
 import App from './app/App.vue'
 import {router} from './app/providers/router/index'
+import './app/styles/main.sass'
 
 const app = createApp(App)
 

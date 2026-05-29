@@ -23,7 +23,14 @@ const routes: RouteRecordRaw[] = [
     path: '/auth',
     name: 'auth',
     component: () => import('../../../pages/auth/ui/AuthPage.vue'),
-    meta: { requiresAuth: false }
+    meta: { requiresAuth: false },
+    children: [
+      {
+        path: 'sign-up',
+        name: 'register',
+        component: () => import('../../../pages/auth/ui/AuthPage.vue') // Используем ту же подложку страницы
+      }
+    ]
   }
 ]
 
