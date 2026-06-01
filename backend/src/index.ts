@@ -5,7 +5,7 @@ import{ cors } from 'hono/cors'
 import { trimTrailingSlash } from "hono/trailing-slash";
 import { clerkMiddleware } from '@clerk/hono';
 import bookRoute from './modules/book/book.routes';
-import folderRouter from "./modules/book/book.routes";
+import folderRouter from "./modules/folder/folder.routes";
 import { clerkAuthMiddleware } from "./middleware/auth";
 
 type Variables = {
@@ -24,7 +24,7 @@ app.use('/api/books/*', clerkAuthMiddleware());
 app.route('/api/books', bookRoute);
 
 app.use('/api/folders/*', clerkAuthMiddleware())
-app.route('/api/folder', folderRouter)
+app.route('/api/folders', folderRouter)
 
 app.get('/', (c) => {
   return c.text('Hello Honods!')

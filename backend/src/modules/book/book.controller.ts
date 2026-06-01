@@ -95,21 +95,27 @@ export const deleteBook = async (c: Context) => {
     const userId = c.get('jwtPayload').id;
     const bookId = c.req.param('id');
 
+    const existingBook = await prisma.book.findFirst({
+      where: { id: bookId, users: { some: { id: userId } } },
+      include: { folders: { where: { userId } } }
+    });
+
+    if (!existingBook) {
+      return c.json({ success: false, error: 'Книга не найдена или доступ запрещен' }, 404);
+    }
+
     const updatedBook = await prisma.book.update({
       where: { id: bookId },
       data: {
-        users: {
-          disconnect: { id: userId } 
-        },
-
+        users: { disconnect: { id: userId } },
         folders: {
-          disconnect: { userId: userId }
+          disconnect: existingBook.folders.map(f => ({ id: f.id }))
         }
       }
     });
 
     return c.json({ success: true, data: updatedBook, message: 'Книга успешно удалена из вашей библиотеки' });
   } catch (error) {
-    return c.json({ success: false, error: 'Книга не найдена или доступ запрещен' }, 404);
+    return c.json({ success: false, error: 'Ошибка сервера при удалении книги' }, 500);
   }
 };

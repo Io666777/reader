@@ -5,8 +5,7 @@ const folderRouter = new Hono();
 
 folderRouter.get('/', getUserFolders);
 folderRouter.post('/', createFolder);
-folderRouter.post('/:id', updateFolder)
-folderRouter.post('/:id', deleteFolder)
-
+folderRouter.put('/:id', updateFolder);
+folderRouter.delete('/:id', deleteFolder);
 
 export default folderRouter;
