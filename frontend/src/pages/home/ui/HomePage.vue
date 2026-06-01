@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
 import { BookCard, FolderCard } from "@/entities/book";
 import { BaseButton, BaseInput, BookSelector, FileUpload } from "@/shared/ui";
 import { useFolders, FOLDER_SORT_OPTIONS } from "../model/useFolders";
@@ -24,6 +25,20 @@ const {
   fetchFolders, createFolder, deleteFolder, renameFolder,
   toggleAddFolder, toggleSort: toggleFolderSort,
 } = useFolders(books);
+
+const router = useRouter()
+
+const handleCreateEvent = (payload: { folderId?: string; bookId?: string; label: string }) => {
+  router.push({
+    path: '/activity',
+    query: {
+      create: '1',
+      ...(payload.folderId ? { folderId: payload.folderId } : {}),
+      ...(payload.bookId ? { bookId: payload.bookId } : {}),
+      label: payload.label,
+    },
+  })
+}
 
 onMounted(() => {
   fetchBooks()
@@ -150,6 +165,7 @@ const folderSelectorItems = computed(() =>
           @view-activity="handleViewActivity"
           @book-remove="({ bookId, folderId }) => removeBookFromFolder(bookId, folderId)"
           @add-to-folder="handleAddToFolder"
+          @create-event="handleCreateEvent"
         />
       </div>
     </section>
@@ -229,6 +245,7 @@ const folderSelectorItems = computed(() =>
           :disabled="deletingBookId === book.id"
           @view-activity="handleViewActivity"
           @add-to-folder="handleAddToFolder"
+          @create-event="handleCreateEvent"
           @delete="deleteBook"
         />
       </div>

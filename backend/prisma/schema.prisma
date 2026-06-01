@@ -11,9 +11,10 @@ model User {
   email     String   @unique
   username  String?
   createdAt DateTime @default(now())
-  
+
   folders Folder[]
   books   Book[]
+  events  Event[]
 }
 
 model Folder {
@@ -24,7 +25,8 @@ model Folder {
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  books Book[]
+  books  Book[]
+  events Event[]
 }
 
 model Book {
@@ -39,4 +41,22 @@ model Book {
 
   folders Folder[]
   users   User[]
+  events  Event[]
+}
+
+model Event {
+  id        String   @id @default(uuid())
+  title     String
+  dueDate   DateTime
+  status    String   @default("pending")
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  folderId String?
+  folder   Folder? @relation(fields: [folderId], references: [id], onDelete: SetNull)
+
+  bookId String?
+  book   Book?   @relation(fields: [bookId], references: [id], onDelete: SetNull)
 }

@@ -11,7 +11,7 @@ const props = defineProps<{
 }>();
 
 // Добавляем события управления папкой
-const emit = defineEmits(["view-activity", "book-remove", "remove-folder", "edit-folder", "add-to-folder"]);
+const emit = defineEmits(["view-activity", "book-remove", "remove-folder", "edit-folder", "add-to-folder", "create-event"]);
 
 const isOpen = ref(false);
 </script>
@@ -25,6 +25,7 @@ const isOpen = ref(false);
       </div>
       
       <div class="folder-actions">
+        <BaseButton variant="action" @click="emit('create-event', { folderId: folder.id, label: folder.name })">Событие</BaseButton>
         <BaseButton variant="action" :disabled="disabled" @click="emit('edit-folder', folder.id)">Изменить</BaseButton>
         <BaseButton variant="danger" :disabled="disabled" @click="emit('remove-folder', folder.id)">Удалить</BaseButton>
       </div>

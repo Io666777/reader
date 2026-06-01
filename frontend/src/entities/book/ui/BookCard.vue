@@ -5,7 +5,7 @@ import BaseButton from "@/shared/ui/BaseButton.vue";
 
 defineProps<{ book: Book; disabled?: boolean }>();
 const isExpanded = ref(false);
-const emit = defineEmits(["view-activity", "delete", "add-to-folder"]);
+const emit = defineEmits(["view-activity", "delete", "add-to-folder", "create-event"]);
 </script>
 
 <template>
@@ -30,6 +30,9 @@ const emit = defineEmits(["view-activity", "delete", "add-to-folder"]);
         </BaseButton>
         <BaseButton variant="action" :disabled="disabled" @click="emit('add-to-folder', book.id)">
           Назначить папку
+        </BaseButton>
+        <BaseButton variant="action" :disabled="disabled" @click="emit('create-event', { bookId: book.id, label: book.title ?? 'Книга' })">
+          Событие
         </BaseButton>
         <BaseButton variant="danger" :disabled="disabled" @click="emit('delete', book.id)">
           Удалить

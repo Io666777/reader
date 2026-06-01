@@ -6,6 +6,7 @@ import { trimTrailingSlash } from "hono/trailing-slash";
 import { clerkMiddleware } from '@clerk/hono';
 import bookRoute from './modules/book/book.routes';
 import folderRouter from "./modules/folder/folder.routes";
+import eventRouter from "./modules/event/event.routes";
 import { makeUploadHandler } from './modules/upload/upload.routes';
 import { clerkAuthMiddleware } from "./middleware/auth";
 
@@ -36,6 +37,9 @@ app.route('/api/books', bookRoute);
 
 app.use('/api/folders/*', clerkAuthMiddleware())
 app.route('/api/folders', folderRouter)
+
+app.use('/api/events/*', clerkAuthMiddleware())
+app.route('/api/events', eventRouter)
 
 app.get('/', (c) => {
   return c.text('Hello Honods!')
