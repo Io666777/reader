@@ -17,6 +17,9 @@ interface UpdateBookDto {
   author?: string
   description?: string
   image?: string
+  fileUrl?: string
+  fileType?: string
+  folderIds?: string[]
 }
 
 export const createBooksApi = (getToken: () => Promise<string | null>) => ({

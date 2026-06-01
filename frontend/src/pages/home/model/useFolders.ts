@@ -3,10 +3,11 @@ import { useAuth } from '@clerk/vue'
 import { createFoldersApi } from '@/shared/api/folders'
 import type { Book, Folder } from '@/entities/book'
 
-type FolderSortKey = 'name' | 'createdAt'
+type FolderSortKey = 'name' | 'createdAt' | 'bookCount'
 
 export const FOLDER_SORT_OPTIONS: { key: FolderSortKey; label: string }[] = [
   { key: 'name', label: 'По названию' },
+  { key: 'bookCount', label: 'По кол-ву книг' },
   { key: 'createdAt', label: 'По дате' },
 ]
 
@@ -19,6 +20,7 @@ export function useFolders(books: Ref<Book[]>) {
   const error = ref<string | null>(null)
 
   const isSubmitting = ref(false)
+  const deletingFolderId = ref<string | null>(null)
   const isAddingFolder = ref(false)
   const isBooksMenuOpen = ref(false)
   const isSortOpen = ref(false)
@@ -51,7 +53,16 @@ export function useFolders(books: Ref<Book[]>) {
     if (activeSorts.value.length) {
       result = [...result].sort((a, b) => {
         for (const key of activeSorts.value) {
-          const cmp = String(a[key]).localeCompare(String(b[key]))
+          let cmp: number
+          if (key === 'bookCount') {
+            const aCount = books.value.filter(bk => bk.folders.some(f => f.id === a.id)).length
+            const bCount = books.value.filter(bk => bk.folders.some(f => f.id === b.id)).length
+            cmp = bCount - aCount
+          } else if (key === 'createdAt') {
+            cmp = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+          } else {
+            cmp = String(a[key]).localeCompare(String(b[key]))
+          }
           if (cmp !== 0) return cmp
         }
         return 0
@@ -78,12 +89,15 @@ export function useFolders(books: Ref<Book[]>) {
   }
 
   const deleteFolder = async (id: string) => {
+    deletingFolderId.value = id
     error.value = null
     try {
       await foldersApi.remove(id)
       folders.value = folders.value.filter(f => f.id !== id)
     } catch (e: any) {
       error.value = e.message
+    } finally {
+      deletingFolderId.value = null
     }
   }
 
@@ -113,6 +127,7 @@ export function useFolders(books: Ref<Book[]>) {
     folders,
     isLoading,
     isSubmitting,
+    deletingFolderId,
     error,
     isAddingFolder,
     isBooksMenuOpen,

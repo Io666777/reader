@@ -76,16 +76,31 @@ export const updateBook = async (c: Context) => {
       return c.json({ success: false, error: 'Книга не найдена или доступ запрещен' }, 404);
     }
 
+    const data: any = {
+      title: body.title,
+      author: body.author,
+      description: body.description,
+      image: body.image,
+      fileUrl: body.fileUrl,
+      fileType: body.fileType,
+    }
+
+    if ('folderIds' in body) {
+      const userFolders = await prisma.folder.findMany({
+        where: { userId },
+        select: { id: true }
+      })
+      const ids: string[] = body.folderIds ?? []
+      data.folders = {
+        disconnect: userFolders.map(f => ({ id: f.id })),
+        ...(ids.length ? { connect: ids.map((id: string) => ({ id })) } : {})
+      }
+    }
+
     const updatedBook = await prisma.book.update({
       where: { id: bookId },
-      data: {
-        title: body.title,
-        author: body.author,
-        description: body.description,
-        image: body.image,
-        fileUrl: body.fileUrl,
-        fileType: body.fileType,
-      }
+      data,
+      include: { folders: true }
     });
 
     return c.json({ success: true, data: updatedBook });

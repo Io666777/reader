@@ -20,6 +20,7 @@ export function useBooks() {
   const error = ref<string | null>(null)
 
   const isSubmitting = ref(false)
+  const deletingBookId = ref<string | null>(null)
   const isAddingBook = ref(false)
   const isFolderMenuOpen = ref(false)
   const isSortOpen = ref(false)
@@ -44,8 +45,9 @@ export function useBooks() {
     }
   }
 
-  const filteredRootBooks = computed(() => {
-    let result = books.value.filter(b => b.folders.length === 0)
+  // Все книги отображаются в общем списке независимо от папок
+  const filteredBooks = computed(() => {
+    let result = [...books.value]
 
     if (bookSearch.value) {
       result = result.filter(b =>
@@ -54,9 +56,14 @@ export function useBooks() {
     }
 
     if (activeSorts.value.length) {
-      result = [...result].sort((a, b) => {
+      result = result.sort((a, b) => {
         for (const key of activeSorts.value) {
-          const cmp = String(a[key] ?? '').localeCompare(String(b[key] ?? ''))
+          let cmp: number
+          if (key === 'createdAt') {
+            cmp = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+          } else {
+            cmp = String(a[key] ?? '').localeCompare(String(b[key] ?? ''))
+          }
           if (cmp !== 0) return cmp
         }
         return 0
@@ -92,13 +99,33 @@ export function useBooks() {
     }
   }
 
+  const removeBookFromFolder = async (bookId: string, folderId: string) => {
+    const book = books.value.find(b => b.id === bookId)
+    if (!book) return
+    const newFolderIds = book.folders.filter(f => f.id !== folderId).map(f => f.id)
+    await updateBookFolders(bookId, newFolderIds)
+  }
+
+  const updateBookFolders = async (bookId: string, folderIds: string[]) => {
+    error.value = null
+    try {
+      await booksApi.update(bookId, { folderIds })
+      await fetchBooks()
+    } catch (e: any) {
+      error.value = e.message
+    }
+  }
+
   const deleteBook = async (id: string) => {
+    deletingBookId.value = id
     error.value = null
     try {
       await booksApi.remove(id)
       books.value = books.value.filter(b => b.id !== id)
     } catch (e: any) {
       error.value = e.message
+    } finally {
+      deletingBookId.value = null
     }
   }
 
@@ -117,6 +144,7 @@ export function useBooks() {
     books,
     isLoading,
     isSubmitting,
+    deletingBookId,
     error,
     isAddingBook,
     isFolderMenuOpen,
@@ -128,9 +156,11 @@ export function useBooks() {
     bookFileType,
     selectedFolderId,
     activeSorts,
-    filteredRootBooks,
+    filteredBooks,
     fetchBooks,
     createBook,
+    updateBookFolders,
+    removeBookFromFolder,
     deleteBook,
     toggleAddBook,
     toggleSort,

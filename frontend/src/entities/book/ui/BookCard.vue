@@ -3,7 +3,7 @@ import { ref } from "vue";
 import type { Book } from "../model/types";
 import BaseButton from "@/shared/ui/BaseButton.vue";
 
-defineProps<{ book: Book }>();
+defineProps<{ book: Book; disabled?: boolean }>();
 const isExpanded = ref(false);
 const emit = defineEmits(["view-activity", "delete", "add-to-folder"]);
 </script>
@@ -25,13 +25,13 @@ const emit = defineEmits(["view-activity", "delete", "add-to-folder"]);
         <a v-if="book.fileUrl" :href="book.fileUrl" target="_blank" class="read-link">
           <BaseButton variant="action">Читать</BaseButton>
         </a>
-        <BaseButton variant="action" @click="emit('view-activity', book.id)">
+        <BaseButton variant="action" :disabled="disabled" @click="emit('view-activity', book.id)">
           Активность
         </BaseButton>
-        <BaseButton variant="action" @click="emit('add-to-folder', book.id)">
+        <BaseButton variant="action" :disabled="disabled" @click="emit('add-to-folder', book.id)">
           Назначить папку
         </BaseButton>
-        <BaseButton variant="danger" @click="emit('delete', book.id)">
+        <BaseButton variant="danger" :disabled="disabled" @click="emit('delete', book.id)">
           Удалить
         </BaseButton>
       </div>

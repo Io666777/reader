@@ -1,21 +1,23 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
 import { BookCard, FolderCard } from "@/entities/book";
-import { BaseButton, BaseInput, BookSelector, FolderSelector, FileUpload } from "@/shared/ui";
+import { BaseButton, BaseInput, BookSelector, FileUpload } from "@/shared/ui";
 import { useFolders, FOLDER_SORT_OPTIONS } from "../model/useFolders";
 import { useBooks, BOOK_SORT_OPTIONS } from "../model/useBooks";
 
 const {
-  books, isLoading: isBooksLoading, isSubmitting: isBookSubmitting, error: booksError,
+  books, isLoading: isBooksLoading, isSubmitting: isBookSubmitting,
+  deletingBookId, error: booksError,
   isAddingBook, isFolderMenuOpen, isSortOpen: isBookSortOpen,
   bookSearch, bookName, bookAuthor, bookFileUrl, bookFileType, selectedFolderId,
-  activeSorts: bookActiveSorts, filteredRootBooks,
-  fetchBooks, createBook, deleteBook,
+  activeSorts: bookActiveSorts, filteredBooks,
+  fetchBooks, createBook, updateBookFolders, removeBookFromFolder, deleteBook,
   toggleAddBook, toggleSort: toggleBookSort, handleViewActivity,
 } = useBooks();
 
 const {
-  folders, isLoading: isFoldersLoading, isSubmitting: isFolderSubmitting, error: foldersError,
+  folders, isLoading: isFoldersLoading, isSubmitting: isFolderSubmitting,
+  deletingFolderId, error: foldersError,
   isAddingFolder, isBooksMenuOpen, isSortOpen: isFolderSortOpen,
   folderSearch, folderName, selectedBooksIds, activeSorts: folderActiveSorts,
   filteredFolders, getBooksInFolder,
@@ -27,6 +29,23 @@ onMounted(() => {
   fetchBooks()
   fetchFolders()
 })
+
+// Назначение папок книге (multi-select)
+const assigningBookId = ref<string | null>(null)
+const assigningFolderIds = ref<string[]>([])
+
+const handleAddToFolder = (bookId: string) => {
+  assigningBookId.value = bookId
+  const book = books.value.find(b => b.id === bookId)
+  assigningFolderIds.value = book?.folders.map(f => f.id) ?? []
+}
+
+const submitAssignFolder = async () => {
+  if (!assigningBookId.value) return
+  await updateBookFolders(assigningBookId.value, assigningFolderIds.value)
+  assigningBookId.value = null
+  assigningFolderIds.value = []
+}
 
 // Переименование папки
 const editingFolder = ref<{ id: string; name: string } | null>(null)
@@ -48,6 +67,9 @@ const bookSelectorItems = computed(() =>
 const folderSelectorItems = computed(() =>
   folders.value.map(f => ({ id: f.id, label: f.name }))
 )
+
+// FolderSelector больше не нужен — используем BookSelector (checkboxes) для назначения папок
+
 </script>
 
 <template>
@@ -122,10 +144,12 @@ const folderSelectorItems = computed(() =>
           :key="folder.id"
           :folder="folder"
           :books="getBooksInFolder(folder.id)"
+          :disabled="deletingFolderId === folder.id || isFolderSubmitting"
           @edit-folder="handleEditFolder"
           @remove-folder="deleteFolder"
           @view-activity="handleViewActivity"
-          @delete="deleteBook"
+          @book-remove="({ bookId, folderId }) => removeBookFromFolder(bookId, folderId)"
+          @add-to-folder="handleAddToFolder"
         />
       </div>
     </section>
@@ -184,14 +208,27 @@ const folderSelectorItems = computed(() =>
         </div>
       </Transition>
 
+      <Transition name="fade">
+        <div v-if="assigningBookId" class="add-panel-container">
+          <div class="add-panel">
+            <span class="assign-label">Папки для книги:</span>
+            <BaseButton variant="action" @click="submitAssignFolder">Сохранить</BaseButton>
+            <BaseButton variant="page" @click="assigningBookId = null">Отмена</BaseButton>
+          </div>
+          <BookSelector v-model="assigningFolderIds" :items="folderSelectorItems" title="Выбрать папки:" />
+        </div>
+      </Transition>
+
       <p v-if="isBooksLoading" class="loading-text">Загрузка...</p>
 
       <div class="books-paper">
         <BookCard
-          v-for="book in filteredRootBooks"
+          v-for="book in filteredBooks"
           :key="book.id"
           :book="book"
+          :disabled="deletingBookId === book.id"
           @view-activity="handleViewActivity"
+          @add-to-folder="handleAddToFolder"
           @delete="deleteBook"
         />
       </div>
@@ -284,6 +321,11 @@ const folderSelectorItems = computed(() =>
   +sm
     flex-direction: column
     align-items: stretch
+
+.assign-label
+  font-size: 13px
+  color: #6b7280
+  white-space: nowrap
 
 .error-text
   font-size: 13px

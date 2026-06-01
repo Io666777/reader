@@ -7,10 +7,11 @@ import BaseButton from "@/shared/ui/BaseButton.vue";
 const props = defineProps<{
   folder: Folder;
   books: Book[];
+  disabled?: boolean;
 }>();
 
 // Добавляем события управления папкой
-const emit = defineEmits(["view-activity", "delete", "remove-folder", "edit-folder"]);
+const emit = defineEmits(["view-activity", "book-remove", "remove-folder", "edit-folder", "add-to-folder"]);
 
 const isOpen = ref(false);
 </script>
@@ -24,8 +25,8 @@ const isOpen = ref(false);
       </div>
       
       <div class="folder-actions">
-        <BaseButton variant="action" @click="emit('edit-folder', folder.id)">Изменить</BaseButton>
-        <BaseButton variant="danger" @click="emit('remove-folder', folder.id)">Удалить</BaseButton>
+        <BaseButton variant="action" :disabled="disabled" @click="emit('edit-folder', folder.id)">Изменить</BaseButton>
+        <BaseButton variant="danger" :disabled="disabled" @click="emit('remove-folder', folder.id)">Удалить</BaseButton>
       </div>
     </div>
 
@@ -36,7 +37,8 @@ const isOpen = ref(false);
             :key="book.id"
             :book="book"
             @view-activity="emit('view-activity', $event)"
-            @delete="emit('delete', $event)"
+            @delete="(bookId) => emit('book-remove', { bookId, folderId: props.folder.id })"
+            @add-to-folder="emit('add-to-folder', $event)"
           />
       </div>
     </Transition>
