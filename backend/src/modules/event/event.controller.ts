@@ -32,6 +32,7 @@ export const createEvent = async (c: Context) => {
     const event = await prisma.event.create({
       data: {
         title: body.title,
+        startDate: body.startDate ? new Date(body.startDate) : null,
         dueDate: new Date(body.dueDate),
         userId,
         folderId: body.folderId || null,
@@ -40,7 +41,8 @@ export const createEvent = async (c: Context) => {
       include,
     })
     return c.json({ success: true, data: event }, 201)
-  } catch {
+  } catch (e) {
+    console.error('[createEvent]', e)
     return c.json({ success: false, error: 'Не удалось создать событие' }, 500)
   }
 }
@@ -58,6 +60,9 @@ export const updateEvent = async (c: Context) => {
       where: { id: eventId },
       data: {
         title: body.title ?? existing.title,
+        startDate: body.startDate !== undefined
+          ? (body.startDate ? new Date(body.startDate) : null)
+          : existing.startDate,
         dueDate: body.dueDate ? new Date(body.dueDate) : existing.dueDate,
         status: body.status ?? existing.status,
       },

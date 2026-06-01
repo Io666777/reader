@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useEvents } from '../model/useEvents'
 import { BaseButton, BaseInput } from '@/shared/ui'
@@ -8,7 +8,7 @@ const route = useRoute()
 
 const {
   events, isLoading, isSubmitting, error,
-  newTitle, newDueDate, newFolderId, newBookId, contextLabel,
+  newTitle, newStartDate, newDueDate, newFolderId, newBookId, contextLabel,
   fetchEvents, createEvent, toggleStatus, deleteEvent,
 } = useEvents()
 
@@ -24,23 +24,40 @@ onMounted(() => {
 const today = new Date()
 today.setHours(0, 0, 0, 0)
 
-const days = computed(() => {
-  return Array.from({ length: 21 }, (_, i) => {
+// Heat map: цвет ячейки зависит от кол-ва событий
+const cellColor = (count: number, hasOverdue: boolean): string => {
+  if (count === 0) return ''
+  const reds   = ['#fee2e2', '#fecaca', '#fca5a5', '#f87171']
+  const blues  = ['#eff6ff', '#dbeafe', '#bfdbfe', '#93c5fd']
+  return (hasOverdue ? reds : blues)[Math.min(count - 1, 3)]
+}
+
+const days = computed(() =>
+  Array.from({ length: 21 }, (_, i) => {
     const date = new Date(today)
     date.setDate(today.getDate() + i)
     const dateStr = date.toISOString().split('T')[0]
-    const dayEvents = events.value.filter(e => e.dueDate.startsWith(dateStr))
+
+    const dayEvents = events.value.filter(e => {
+      const start = (e.startDate ?? e.dueDate).split('T')[0]
+      const end   = e.dueDate.split('T')[0]
+      return dateStr >= start && dateStr <= end
+    })
+
+    const hasOverdue = dayEvents.some(
+      e => e.status === 'pending' && new Date(e.dueDate).setHours(0,0,0,0) < today.getTime()
+    )
+
     return {
       dateStr,
       num: date.getDate(),
       name: date.toLocaleDateString('ru', { weekday: 'short' }),
       isToday: i === 0,
-      hasOverdue: dayEvents.some(e => e.status === 'pending' && new Date(e.dueDate) < new Date()),
-      hasPending: dayEvents.some(e => e.status === 'pending'),
-      hasDone: dayEvents.some(e => e.status === 'done'),
+      count: dayEvents.length,
+      color: cellColor(dayEvents.length, hasOverdue),
     }
   })
-})
+)
 
 const overdue = computed(() =>
   events.value.filter(e => {
@@ -48,20 +65,46 @@ const overdue = computed(() =>
     return d < today && e.status === 'pending'
   })
 )
-
 const upcoming = computed(() =>
   events.value.filter(e => {
     const d = new Date(e.dueDate); d.setHours(0, 0, 0, 0)
     return d >= today && e.status === 'pending'
   })
 )
-
 const done = computed(() => events.value.filter(e => e.status === 'done'))
 
-const isCreating = computed(() => route.query.create === '1' || newFolderId.value || newBookId.value)
+// Режим ввода дат
+type DateMode = 'single' | 'range'
+const dateMode = ref<DateMode>('single')
+
+const setDateMode = (mode: DateMode) => {
+  dateMode.value = mode
+  if (mode === 'single') newStartDate.value = ''
+}
+
+// Умные дефолты: незаполненные даты = сегодня / начало
+const handleCreate = async () => {
+  if (!newTitle.value.trim()) return
+  const todayStr = new Date().toISOString().split('T')[0]
+
+  if (dateMode.value === 'range') {
+    if (!newStartDate.value) newStartDate.value = todayStr
+    if (!newDueDate.value)   newDueDate.value   = newStartDate.value
+  } else {
+    newStartDate.value = ''
+    if (!newDueDate.value) newDueDate.value = todayStr
+  }
+
+  await createEvent()
+}
 
 const formatDate = (iso: string) =>
   new Date(iso).toLocaleDateString('ru', { day: 'numeric', month: 'short' })
+
+const formatRange = (ev: { startDate: string | null; dueDate: string }) =>
+  ev.startDate
+    ? `${formatDate(ev.startDate)} — ${formatDate(ev.dueDate)}`
+    : formatDate(ev.dueDate)
 </script>
 
 <template>
@@ -75,14 +118,11 @@ const formatDate = (iso: string) =>
           :key="day.dateStr"
           class="day-cell"
           :class="{ 'day-cell--today': day.isToday }"
+          :style="day.color ? { backgroundColor: day.color, borderColor: 'transparent' } : {}"
         >
           <span class="day-name">{{ day.name }}</span>
           <span class="day-num">{{ day.num }}</span>
-          <div class="day-dots">
-            <span v-if="day.hasOverdue" class="dot dot--red" />
-            <span v-else-if="day.hasPending" class="dot dot--blue" />
-            <span v-if="day.hasDone" class="dot dot--green" />
-          </div>
+          <span v-if="day.count" class="day-count">{{ day.count }}</span>
         </div>
       </div>
     </div>
@@ -92,14 +132,31 @@ const formatDate = (iso: string) =>
       <p v-if="contextLabel" class="context-label">
         {{ newFolderId ? 'Папка:' : 'Книга:' }} <strong>{{ contextLabel }}</strong>
       </p>
+
+      <div class="mode-toggle">
+        <button class="mode-btn" :class="{ 'mode-btn--active': dateMode === 'single' }" @click="setDateMode('single')">
+          Конкретный день
+        </button>
+        <button class="mode-btn" :class="{ 'mode-btn--active': dateMode === 'range' }" @click="setDateMode('range')">
+          Промежуток
+        </button>
+      </div>
+
       <div class="form-row">
         <BaseInput v-model="newTitle" placeholder="Название события" />
-        <input v-model="newDueDate" type="date" class="date-input" />
-        <BaseButton
-          variant="action"
-          :disabled="!newTitle.trim() || !newDueDate || isSubmitting"
-          @click="createEvent"
-        >
+        <div class="date-inputs">
+          <template v-if="dateMode === 'range'">
+            <input v-model="newStartDate" type="date" class="date-input" :max="newDueDate || undefined" />
+            <span class="date-sep">—</span>
+          </template>
+          <input
+            v-model="newDueDate"
+            type="date"
+            class="date-input"
+            :min="dateMode === 'range' ? (newStartDate || undefined) : undefined"
+          />
+        </div>
+        <BaseButton variant="action" :disabled="!newTitle.trim() || isSubmitting" @click="handleCreate">
           Создать
         </BaseButton>
       </div>
@@ -117,7 +174,7 @@ const formatDate = (iso: string) =>
           <div class="event-body">
             <span class="event-title">{{ ev.title }}</span>
             <div class="event-meta">
-              <span class="event-date event-date--red">{{ formatDate(ev.dueDate) }}</span>
+              <span class="event-date event-date--red">{{ formatRange(ev) }}</span>
               <span v-if="ev.folder" class="event-badge">{{ ev.folder.name }}</span>
               <span v-else-if="ev.book" class="event-badge">{{ ev.book.title ?? 'Книга' }}</span>
             </div>
@@ -136,7 +193,7 @@ const formatDate = (iso: string) =>
           <div class="event-body">
             <span class="event-title">{{ ev.title }}</span>
             <div class="event-meta">
-              <span class="event-date">{{ formatDate(ev.dueDate) }}</span>
+              <span class="event-date">{{ formatRange(ev) }}</span>
               <span v-if="ev.folder" class="event-badge">{{ ev.folder.name }}</span>
               <span v-else-if="ev.book" class="event-badge">{{ ev.book.title ?? 'Книга' }}</span>
             </div>
@@ -155,7 +212,7 @@ const formatDate = (iso: string) =>
           <div class="event-body">
             <span class="event-title">{{ ev.title }}</span>
             <div class="event-meta">
-              <span class="event-date">{{ formatDate(ev.dueDate) }}</span>
+              <span class="event-date">{{ formatRange(ev) }}</span>
               <span v-if="ev.folder" class="event-badge">{{ ev.folder.name }}</span>
               <span v-else-if="ev.book" class="event-badge">{{ ev.book.title ?? 'Книга' }}</span>
             </div>
@@ -177,6 +234,7 @@ const formatDate = (iso: string) =>
   flex-direction: column
   gap: 28px
 
+// Лента дат
 .date-strip-wrap
   overflow-x: auto
   -webkit-overflow-scrolling: touch
@@ -191,14 +249,15 @@ const formatDate = (iso: string) =>
   display: flex
   flex-direction: column
   align-items: center
-  gap: 4px
+  gap: 3px
   padding: 8px 6px
   border-radius: 8px
   border: 1px solid #e5e7eb
   min-width: 44px
+  transition: background-color 0.2s
 
   &--today
-    border-color: #111827
+    border-color: #111827 !important
 
 .day-name
   font-size: 10px
@@ -210,29 +269,36 @@ const formatDate = (iso: string) =>
   font-weight: 600
   color: #111827
 
-.day-dots
-  display: flex
-  gap: 3px
-  min-height: 8px
+.day-count
+  font-size: 10px
+  font-weight: 600
+  color: #6b7280
 
-.dot
-  width: 6px
-  height: 6px
-  border-radius: 50%
-
-  &--red
-    background: #ef4444
-
-  &--blue
-    background: #3b82f6
-
-  &--green
-    background: #22c55e
-
+// Форма создания
 .create-form
   display: flex
   flex-direction: column
   gap: 8px
+
+.mode-toggle
+  display: flex
+  border: 1px solid #e5e7eb
+  border-radius: 6px
+  overflow: hidden
+  align-self: flex-start
+
+.mode-btn
+  padding: 5px 14px
+  font-size: 12px
+  font-weight: 500
+  color: #9ca3af
+  background: #fff
+  border: none
+  cursor: pointer
+
+  &--active
+    background: #111827
+    color: #fff
 
 .form-row
   display: flex
@@ -241,6 +307,16 @@ const formatDate = (iso: string) =>
   +sm
     flex-direction: column
     align-items: stretch
+
+.date-inputs
+  display: flex
+  align-items: center
+  gap: 6px
+  flex-shrink: 0
+
+.date-sep
+  font-size: 13px
+  color: #9ca3af
 
 .date-input
   padding: 6px 10px
@@ -251,13 +327,13 @@ const formatDate = (iso: string) =>
   background: #fff
   color: #111827
   cursor: pointer
-  flex-shrink: 0
 
 .context-label
   font-size: 13px
   color: #6b7280
   margin: 0
 
+// Секции событий
 .event-section
   display: flex
   flex-direction: column

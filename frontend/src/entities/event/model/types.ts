@@ -1,6 +1,7 @@
 export interface UserEvent {
   id: string
   title: string
+  startDate: string | null
   dueDate: string
   status: 'pending' | 'done'
   folderId: string | null

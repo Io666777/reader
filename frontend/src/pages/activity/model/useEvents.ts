@@ -13,6 +13,7 @@ export function useEvents() {
   const error = ref<string | null>(null)
 
   const newTitle = ref('')
+  const newStartDate = ref('')
   const newDueDate = ref('')
   const newFolderId = ref<string | null>(null)
   const newBookId = ref<string | null>(null)
@@ -32,12 +33,13 @@ export function useEvents() {
   }
 
   const createEvent = async () => {
-    if (!newTitle.value.trim() || !newDueDate.value || isSubmitting.value) return
+    if (!newTitle.value.trim() || isSubmitting.value) return
     isSubmitting.value = true
     error.value = null
     try {
       const res = await eventsApi.create({
         title: newTitle.value,
+        startDate: newStartDate.value || undefined,
         dueDate: newDueDate.value,
         folderId: newFolderId.value || undefined,
         bookId: newBookId.value || undefined,
@@ -46,6 +48,7 @@ export function useEvents() {
         (a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
       )
       newTitle.value = ''
+      newStartDate.value = ''
       newDueDate.value = ''
       newFolderId.value = null
       newBookId.value = null
@@ -83,6 +86,7 @@ export function useEvents() {
     isSubmitting,
     error,
     newTitle,
+    newStartDate,
     newDueDate,
     newFolderId,
     newBookId,

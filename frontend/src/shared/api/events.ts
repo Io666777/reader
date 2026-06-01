@@ -5,6 +5,7 @@ interface ApiResponse<T> { success: boolean; data: T }
 
 interface CreateEventDto {
   title: string
+  startDate?: string
   dueDate: string
   folderId?: string
   bookId?: string
@@ -12,6 +13,7 @@ interface CreateEventDto {
 
 interface UpdateEventDto {
   title?: string
+  startDate?: string | null
   dueDate?: string
   status?: 'pending' | 'done'
 }
