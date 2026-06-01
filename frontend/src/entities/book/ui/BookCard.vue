@@ -12,10 +12,9 @@ const emit = defineEmits(["view-activity", "delete", "add-to-folder"]);
   <div class="book-card" :class="{ expanded: isExpanded }">
     <div class="main-row" @click="isExpanded = !isExpanded">
       <div class="meta-side">
-        <span class="file-badge">{{ book.fileType.toUpperCase() }}</span>
         <div class="titles">
-          <h4 class="title">{{ book.title }}</h4>
-          <p class="author">{{ book.author }}</p>
+          <h4 class="title">{{ book.title ?? 'Без названия' }}</h4>
+          <p class="author">{{ book.author ?? 'Неизвестный автор' }}</p>
         </div>
       </div>
     </div>

@@ -1,14 +1,15 @@
-import { useAuth } from '@clerk/vue'
-
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:16000/api'
 
 interface RequestOptions extends RequestInit {
   body?: any
 }
 
-export const apiRequest = async <T>(endpoint: string, options: RequestOptions = {}): Promise<T> => {
-  const { getToken } = useAuth()
-  const token = await getToken.value()
+export const apiRequest = async <T>(
+  endpoint: string,
+  getToken: () => Promise<string | null>,
+  options: RequestOptions = {}
+): Promise<T> => {
+  const token = await getToken()
 
   const headers = new Headers(options.headers)
 

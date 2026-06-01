@@ -1,15 +1,24 @@
-import { computed, ref } from 'vue'
-import { MOCK_FOLDERS, MOCK_BOOKS } from '@/entities/book'
+import { computed, ref, type Ref } from 'vue'
+import { useAuth } from '@clerk/vue'
+import { createFoldersApi } from '@/shared/api/folders'
+import type { Book, Folder } from '@/entities/book'
 
-type FolderSortKey = 'name' | 'bookCount' | 'createdAt'
+type FolderSortKey = 'name' | 'createdAt'
 
 export const FOLDER_SORT_OPTIONS: { key: FolderSortKey; label: string }[] = [
   { key: 'name', label: 'По названию' },
-  { key: 'bookCount', label: 'По кол-ву книг' },
   { key: 'createdAt', label: 'По дате' },
 ]
 
-export function useFolders() {
+export function useFolders(books: Ref<Book[]>) {
+  const { getToken } = useAuth()
+  const foldersApi = createFoldersApi(() => getToken.value())
+
+  const folders = ref<Folder[]>([])
+  const isLoading = ref(false)
+  const error = ref<string | null>(null)
+
+  const isSubmitting = ref(false)
   const isAddingFolder = ref(false)
   const isBooksMenuOpen = ref(false)
   const isSortOpen = ref(false)
@@ -18,31 +27,80 @@ export function useFolders() {
   const selectedBooksIds = ref<string[]>([])
   const activeSorts = ref<FolderSortKey[]>([])
 
+  const fetchFolders = async () => {
+    isLoading.value = true
+    error.value = null
+    try {
+      const res = await foldersApi.getAll()
+      folders.value = res.data
+    } catch (e: any) {
+      error.value = e.message
+    } finally {
+      isLoading.value = false
+    }
+  }
+
   const getBooksInFolder = (folderId: string) =>
-    MOCK_BOOKS.filter(b => b.folderId === folderId)
+    books.value.filter(b => b.folders.some(f => f.id === folderId))
 
   const filteredFolders = computed(() => {
-    let folders = MOCK_FOLDERS.filter(f =>
+    let result = folders.value.filter(f =>
       f.name.toLowerCase().includes(folderSearch.value.toLowerCase())
     )
 
     if (activeSorts.value.length) {
-      folders = [...folders].sort((a, b) => {
+      result = [...result].sort((a, b) => {
         for (const key of activeSorts.value) {
-          if (key === 'bookCount') {
-            const cmp = getBooksInFolder(b.id).length - getBooksInFolder(a.id).length
-            if (cmp !== 0) return cmp
-          } else {
-            const cmp = String(a[key]).localeCompare(String(b[key]))
-            if (cmp !== 0) return cmp
-          }
+          const cmp = String(a[key]).localeCompare(String(b[key]))
+          if (cmp !== 0) return cmp
         }
         return 0
       })
     }
 
-    return folders
+    return result
   })
+
+  const createFolder = async () => {
+    if (!folderName.value.trim() || isSubmitting.value) return
+    isSubmitting.value = true
+    error.value = null
+    try {
+      await foldersApi.create({ name: folderName.value })
+      await fetchFolders()
+      folderName.value = ''
+      isAddingFolder.value = false
+    } catch (e: any) {
+      error.value = e.message
+    } finally {
+      isSubmitting.value = false
+    }
+  }
+
+  const deleteFolder = async (id: string) => {
+    error.value = null
+    try {
+      await foldersApi.remove(id)
+      folders.value = folders.value.filter(f => f.id !== id)
+    } catch (e: any) {
+      error.value = e.message
+    }
+  }
+
+  const renameFolder = async (id: string, name: string) => {
+    if (isSubmitting.value) return
+    isSubmitting.value = true
+    error.value = null
+    try {
+      const res = await foldersApi.update(id, { name })
+      const idx = folders.value.findIndex(f => f.id === id)
+      if (idx !== -1) folders.value[idx] = res.data
+    } catch (e: any) {
+      error.value = e.message
+    } finally {
+      isSubmitting.value = false
+    }
+  }
 
   const toggleAddFolder = () => (isAddingFolder.value = !isAddingFolder.value)
 
@@ -52,6 +110,10 @@ export function useFolders() {
   }
 
   return {
+    folders,
+    isLoading,
+    isSubmitting,
+    error,
     isAddingFolder,
     isBooksMenuOpen,
     isSortOpen,
@@ -61,6 +123,10 @@ export function useFolders() {
     activeSorts,
     filteredFolders,
     getBooksInFolder,
+    fetchFolders,
+    createFolder,
+    deleteFolder,
+    renameFolder,
     toggleAddFolder,
     toggleSort,
   }

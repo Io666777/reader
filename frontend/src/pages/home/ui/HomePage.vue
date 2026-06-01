@@ -1,29 +1,53 @@
 <script setup lang="ts">
-import { computed } from "vue";
-import { MOCK_BOOKS, MOCK_FOLDERS, BookCard, FolderCard } from "@/entities/book";
+import { computed, onMounted, ref } from "vue";
+import { BookCard, FolderCard } from "@/entities/book";
 import { BaseButton, BaseInput, BookSelector, FolderSelector } from "@/shared/ui";
 import { useFolders, FOLDER_SORT_OPTIONS } from "../model/useFolders";
 import { useBooks, BOOK_SORT_OPTIONS } from "../model/useBooks";
 
 const {
-  isAddingFolder, isBooksMenuOpen, isSortOpen: isFolderSortOpen,
-  folderSearch, folderName, selectedBooksIds, activeSorts: folderActiveSorts,
-  filteredFolders, getBooksInFolder, toggleAddFolder, toggleSort: toggleFolderSort,
-} = useFolders();
-
-const {
+  books, isLoading: isBooksLoading, isSubmitting: isBookSubmitting, error: booksError,
   isAddingBook, isFolderMenuOpen, isSortOpen: isBookSortOpen,
   bookSearch, bookName, bookAuthor, selectedFolderId,
   activeSorts: bookActiveSorts, filteredRootBooks,
-  toggleAddBook, toggleSort: toggleBookSort, handleViewActivity, handleDeleteBook,
+  fetchBooks, createBook, deleteBook,
+  toggleAddBook, toggleSort: toggleBookSort, handleViewActivity,
 } = useBooks();
 
+const {
+  folders, isLoading: isFoldersLoading, isSubmitting: isFolderSubmitting, error: foldersError,
+  isAddingFolder, isBooksMenuOpen, isSortOpen: isFolderSortOpen,
+  folderSearch, folderName, selectedBooksIds, activeSorts: folderActiveSorts,
+  filteredFolders, getBooksInFolder,
+  fetchFolders, createFolder, deleteFolder, renameFolder,
+  toggleAddFolder, toggleSort: toggleFolderSort,
+} = useFolders(books);
+
+onMounted(() => {
+  fetchBooks()
+  fetchFolders()
+})
+
+// Переименование папки
+const editingFolder = ref<{ id: string; name: string } | null>(null)
+
+const handleEditFolder = (id: string) => {
+  const folder = folders.value.find(f => f.id === id)
+  if (folder) editingFolder.value = { id, name: folder.name }
+}
+
+const submitRenameFolder = async () => {
+  if (!editingFolder.value) return
+  await renameFolder(editingFolder.value.id, editingFolder.value.name)
+  editingFolder.value = null
+}
+
 const bookSelectorItems = computed(() =>
-  MOCK_BOOKS.map(b => ({ id: b.id, label: b.title }))
-);
+  books.value.map(b => ({ id: b.id, label: b.title ?? 'Без названия' }))
+)
 const folderSelectorItems = computed(() =>
-  MOCK_FOLDERS.map(f => ({ id: f.id, label: f.name }))
-);
+  folders.value.map(f => ({ id: f.id, label: f.name }))
+)
 </script>
 
 <template>
@@ -47,6 +71,8 @@ const folderSelectorItems = computed(() =>
         </div>
       </div>
 
+      <p v-if="foldersError" class="error-text">{{ foldersError }}</p>
+
       <Transition name="fade">
         <div v-if="isFolderSortOpen" class="sort-panel">
           <label
@@ -69,11 +95,8 @@ const folderSelectorItems = computed(() =>
         <div v-if="isAddingFolder" class="add-panel-container">
           <div class="add-panel">
             <BaseInput v-model="folderName" placeholder="Название папки" />
-            <BaseButton variant="action">Создать</BaseButton>
-            <BaseButton
-              variant="action"
-              @click="isBooksMenuOpen = !isBooksMenuOpen"
-            >
+            <BaseButton variant="action" :disabled="!folderName.trim() || isFolderSubmitting" @click="createFolder">Создать</BaseButton>
+            <BaseButton variant="action" @click="isBooksMenuOpen = !isBooksMenuOpen">
               {{ selectedBooksIds.length ? `Выбрано: ${selectedBooksIds.length}` : "Выбрать книги" }}
             </BaseButton>
           </div>
@@ -81,12 +104,28 @@ const folderSelectorItems = computed(() =>
         </div>
       </Transition>
 
+      <Transition name="fade">
+        <div v-if="editingFolder" class="add-panel-container">
+          <div class="add-panel">
+            <BaseInput v-model="editingFolder.name" placeholder="Новое название" />
+            <BaseButton variant="action" :disabled="!editingFolder.name.trim() || isFolderSubmitting" @click="submitRenameFolder">Сохранить</BaseButton>
+            <BaseButton variant="page" @click="editingFolder = null">Отмена</BaseButton>
+          </div>
+        </div>
+      </Transition>
+
+      <p v-if="isFoldersLoading" class="loading-text">Загрузка...</p>
+
       <div class="folders-grid">
         <FolderCard
           v-for="folder in filteredFolders"
           :key="folder.id"
           :folder="folder"
           :books="getBooksInFolder(folder.id)"
+          @edit-folder="handleEditFolder"
+          @remove-folder="deleteFolder"
+          @view-activity="handleViewActivity"
+          @delete="deleteBook"
         />
       </div>
     </section>
@@ -109,6 +148,8 @@ const folderSelectorItems = computed(() =>
           </BaseButton>
         </div>
       </div>
+
+      <p v-if="booksError" class="error-text">{{ booksError }}</p>
 
       <Transition name="fade">
         <div v-if="isBookSortOpen" class="sort-panel">
@@ -133,11 +174,8 @@ const folderSelectorItems = computed(() =>
           <div class="add-panel">
             <BaseInput v-model="bookName" placeholder="Название книги" />
             <BaseInput v-model="bookAuthor" placeholder="Автор" />
-            <BaseButton variant="action">Добавить</BaseButton>
-            <BaseButton
-              variant="action"
-              @click="isFolderMenuOpen = !isFolderMenuOpen"
-            >
+            <BaseButton variant="action" :disabled="!bookName.trim() || isBookSubmitting" @click="createBook">Добавить</BaseButton>
+            <BaseButton variant="action" @click="isFolderMenuOpen = !isFolderMenuOpen">
               {{ selectedFolderId ? "Папка выбрана" : "Выбрать папку" }}
             </BaseButton>
           </div>
@@ -145,13 +183,15 @@ const folderSelectorItems = computed(() =>
         </div>
       </Transition>
 
+      <p v-if="isBooksLoading" class="loading-text">Загрузка...</p>
+
       <div class="books-paper">
         <BookCard
           v-for="book in filteredRootBooks"
           :key="book.id"
           :book="book"
           @view-activity="handleViewActivity"
-          @delete="handleDeleteBook"
+          @delete="deleteBook"
         />
       </div>
     </section>
@@ -246,6 +286,16 @@ const folderSelectorItems = computed(() =>
   padding: 16px
   border: 1px solid #e2e8f0
   border-radius: 12px
+
+.error-text
+  font-size: 13px
+  color: #e53e3e
+  margin: 0
+
+.loading-text
+  font-size: 13px
+  color: #94a3b8
+  margin: 0
 
 .books-paper
   display: flex

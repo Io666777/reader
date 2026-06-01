@@ -1,17 +1,16 @@
 export interface Folder {
-  title: any
   id: string
   name: string
-  createdAt: number
+  userId: string
+  createdAt: string
 }
 
 export interface Book {
   id: string
-  title: string
-  author: string
-  fileUrl: string
-  fileType: 'fb2' | 'docx' | 'txt'
-  fileSize?: string
-  folderId: string | null
-  createdAt: number
+  title: string | null
+  author: string | null
+  description: string | null
+  image: string | null
+  createdAt: string
+  folders: Folder[]
 }

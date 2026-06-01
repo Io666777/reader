@@ -12,9 +12,12 @@ defineProps<{
 
 <style scoped lang="sass">
 .base-btn
-  /* Общие стили, если есть */
   cursor: pointer
   transition: all 0.2s
+
+  &:disabled
+    opacity: 0.4
+    cursor: not-allowed
 
   &.page
     padding: 0 12px

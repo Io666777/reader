@@ -31,7 +31,13 @@ const isOpen = ref(false);
 
     <Transition name="slide">
       <div v-if="isOpen" class="folder-content">
-        <BookCard v-for="book in books" :key="book.id" :book="book" />
+        <BookCard
+            v-for="book in books"
+            :key="book.id"
+            :book="book"
+            @view-activity="emit('view-activity', $event)"
+            @delete="emit('delete', $event)"
+          />
       </div>
     </Transition>
   </div>
