@@ -5,7 +5,7 @@ import BaseButton from "@/shared/ui/BaseButton.vue";
 
 defineProps<{ book: Book }>();
 const isExpanded = ref(false);
-const emit = defineEmits(['view-activity', 'delete']);
+const emit = defineEmits(["view-activity", "delete", "add-to-folder"]);
 </script>
 
 <template>
@@ -24,6 +24,9 @@ const emit = defineEmits(['view-activity', 'delete']);
       <div v-if="isExpanded" class="details-panel">
         <BaseButton variant="action" @click="emit('view-activity', book.id)">
           Посмотреть активности
+        </BaseButton>
+        <BaseButton variant="action" @click="emit('add-to-folder', book.id)">
+          Назначить папку
         </BaseButton>
         <BaseButton variant="danger" @click="emit('delete', book.id)">
           Удалить книгу
@@ -78,7 +81,7 @@ const emit = defineEmits(['view-activity', 'delete']);
   margin: 2px 0 0 0
 
 .details-panel
-  padding: 0 20px 16px 60px 
+  padding: 0 20px 16px 60px
   display: flex
   gap: 10px
   width: 100%
@@ -101,5 +104,4 @@ const emit = defineEmits(['view-activity', 'delete']);
 
   &:hover
     opacity: 0.8
-
 </style>

@@ -1,70 +1,89 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import { MOCK_BOOKS, MOCK_FOLDERS } from "@/entities/book/model/mock";
-import BookCard from "@/entities/book/ui/BookCard.vue";
-import FolderCard from "@/entities/book/ui/FolderCard.vue";
-import BaseButton from "@/shared/ui/BaseButton.vue";
-import BaseInput from "@/shared/ui/BaseInput.vue";
-import FolderSelector from "@/shared/ui/FolderSelector.vue";
-import BookSelector from "@/shared/ui/BookSelector.vue";
+import { computed } from "vue";
+import { MOCK_BOOKS, MOCK_FOLDERS, BookCard, FolderCard } from "@/entities/book";
+import { BaseButton, BaseInput, BookSelector, FolderSelector } from "@/shared/ui";
+import { useFolders, FOLDER_SORT_OPTIONS } from "../model/useFolders";
+import { useBooks, BOOK_SORT_OPTIONS } from "../model/useBooks";
 
-// Состояния для панелей
-const isAddingFolder = ref(false);
-const isAddingBook = ref(false);
-const isFolderMenuOpen = ref(false);
-const isBooksMenuOpen = ref(false);
+const {
+  isAddingFolder, isBooksMenuOpen, isSortOpen: isFolderSortOpen,
+  folderSearch, folderName, selectedBooksIds, activeSorts: folderActiveSorts,
+  filteredFolders, getBooksInFolder, toggleAddFolder, toggleSort: toggleFolderSort,
+} = useFolders();
 
-// Данные форм
-const folderName = ref("");
-const bookName = ref("");
-const bookAuthor = ref("");
-const selectedFolderId = ref<string | null>(null);
-const selectedBooksIds = ref<string[]>([]);
+const {
+  isAddingBook, isFolderMenuOpen, isSortOpen: isBookSortOpen,
+  bookSearch, bookName, bookAuthor, selectedFolderId,
+  activeSorts: bookActiveSorts, filteredRootBooks,
+  toggleAddBook, toggleSort: toggleBookSort, handleViewActivity, handleDeleteBook,
+} = useBooks();
 
-// Методы переключения
-const toggleAddFolder = () => (isAddingFolder.value = !isAddingFolder.value);
-const toggleAddBook = () => (isAddingBook.value = !isAddingBook.value);
-
-// Методы бизнес-логики (вызываются при событиях из дочерних компонентов)
-const handleViewActivity = (id: string) => {
-  console.log("Просмотр активности для книги:", id);
-};
-
-const handleDeleteBook = (id: string) => {
-  console.log("Удаление книги:", id);
-  // Здесь будет логика фильтрации MOCK_BOOKS
-};
-
-const getBooksInFolder = (folderId: string) => MOCK_BOOKS.filter((b) => b.folderId === folderId);
-const rootBooks = MOCK_BOOKS.filter((b) => b.folderId === null);
+const bookSelectorItems = computed(() =>
+  MOCK_BOOKS.map(b => ({ id: b.id, label: b.title }))
+);
+const folderSelectorItems = computed(() =>
+  MOCK_FOLDERS.map(f => ({ id: f.id, label: f.name }))
+);
 </script>
 
 <template>
   <div class="home-page">
+    <!-- Папки -->
     <section class="section">
       <div class="section-header">
         <h2 class="section-title">Папки</h2>
-        <BaseButton variant="page" @click="toggleAddFolder">
-          {{ isAddingFolder ? "Отмена" : "Добавить папку" }}
-        </BaseButton>
+        <BaseInput v-model="folderSearch" placeholder="Поиск папки..." />
+        <div class="header-actions">
+          <BaseButton
+            variant="page"
+            :class="{ 'sort-active': folderActiveSorts.length }"
+            @click="isFolderSortOpen = !isFolderSortOpen"
+          >
+            Сортировка{{ folderActiveSorts.length ? ` (${folderActiveSorts.length})` : '' }}
+          </BaseButton>
+          <BaseButton variant="page" @click="toggleAddFolder">
+            {{ isAddingFolder ? "Отмена" : "Добавить папку" }}
+          </BaseButton>
+        </div>
       </div>
+
+      <Transition name="fade">
+        <div v-if="isFolderSortOpen" class="sort-panel">
+          <label
+            v-for="opt in FOLDER_SORT_OPTIONS"
+            :key="opt.key"
+            class="sort-option"
+            :class="{ 'sort-option--active': folderActiveSorts.includes(opt.key) }"
+          >
+            <input
+              type="checkbox"
+              :checked="folderActiveSorts.includes(opt.key)"
+              @change="toggleFolderSort(opt.key)"
+            />
+            {{ opt.label }}
+          </label>
+        </div>
+      </Transition>
 
       <Transition name="fade">
         <div v-if="isAddingFolder" class="add-panel-container">
           <div class="add-panel">
             <BaseInput v-model="folderName" placeholder="Название папки" />
             <BaseButton variant="action">Создать</BaseButton>
-            <BaseButton variant="action" @click="isBooksMenuOpen = !isBooksMenuOpen">
-              {{ selectedBooksIds.length ? `Выбрано: ${selectedBooksIds.length}` : 'Выбрать книги' }}
+            <BaseButton
+              variant="action"
+              @click="isBooksMenuOpen = !isBooksMenuOpen"
+            >
+              {{ selectedBooksIds.length ? `Выбрано: ${selectedBooksIds.length}` : "Выбрать книги" }}
             </BaseButton>
           </div>
-          <BookSelector v-if="isBooksMenuOpen" v-model="selectedBooksIds" />
+          <BookSelector v-if="isBooksMenuOpen" v-model="selectedBooksIds" :items="bookSelectorItems" title="Выбрать книги:" />
         </div>
       </Transition>
 
       <div class="folders-grid">
         <FolderCard
-          v-for="folder in MOCK_FOLDERS"
+          v-for="folder in filteredFolders"
           :key="folder.id"
           :folder="folder"
           :books="getBooksInFolder(folder.id)"
@@ -72,13 +91,42 @@ const rootBooks = MOCK_BOOKS.filter((b) => b.folderId === null);
       </div>
     </section>
 
+    <!-- Книги -->
     <section class="section">
       <div class="section-header">
         <h2 class="section-title">Книги</h2>
-        <BaseButton variant="page" @click="toggleAddBook">
-          {{ isAddingBook ? "Отмена" : "Добавить книгу" }}
-        </BaseButton>
+        <BaseInput v-model="bookSearch" placeholder="Поиск книги..." />
+        <div class="header-actions">
+          <BaseButton
+            variant="page"
+            :class="{ 'sort-active': bookActiveSorts.length }"
+            @click="isBookSortOpen = !isBookSortOpen"
+          >
+            Сортировка{{ bookActiveSorts.length ? ` (${bookActiveSorts.length})` : '' }}
+          </BaseButton>
+          <BaseButton variant="page" @click="toggleAddBook">
+            {{ isAddingBook ? "Отмена" : "Добавить книгу" }}
+          </BaseButton>
+        </div>
       </div>
+
+      <Transition name="fade">
+        <div v-if="isBookSortOpen" class="sort-panel">
+          <label
+            v-for="opt in BOOK_SORT_OPTIONS"
+            :key="opt.key"
+            class="sort-option"
+            :class="{ 'sort-option--active': bookActiveSorts.includes(opt.key) }"
+          >
+            <input
+              type="checkbox"
+              :checked="bookActiveSorts.includes(opt.key)"
+              @change="toggleBookSort(opt.key)"
+            />
+            {{ opt.label }}
+          </label>
+        </div>
+      </Transition>
 
       <Transition name="fade">
         <div v-if="isAddingBook" class="add-panel-container">
@@ -86,19 +134,22 @@ const rootBooks = MOCK_BOOKS.filter((b) => b.folderId === null);
             <BaseInput v-model="bookName" placeholder="Название книги" />
             <BaseInput v-model="bookAuthor" placeholder="Автор" />
             <BaseButton variant="action">Добавить</BaseButton>
-            <BaseButton variant="action" @click="isFolderMenuOpen = !isFolderMenuOpen">
-              {{ selectedFolderId ? 'Папка выбрана' : 'Выбрать папку' }}
+            <BaseButton
+              variant="action"
+              @click="isFolderMenuOpen = !isFolderMenuOpen"
+            >
+              {{ selectedFolderId ? "Папка выбрана" : "Выбрать папку" }}
             </BaseButton>
           </div>
-          <FolderSelector v-if="isFolderMenuOpen" v-model="selectedFolderId" />
+          <FolderSelector v-if="isFolderMenuOpen" v-model="selectedFolderId" :items="folderSelectorItems" title="Выбрать папку:" />
         </div>
       </Transition>
 
       <div class="books-paper">
-        <BookCard 
-          v-for="book in rootBooks" 
-          :key="book.id" 
-          :book="book" 
+        <BookCard
+          v-for="book in filteredRootBooks"
+          :key="book.id"
+          :book="book"
           @view-activity="handleViewActivity"
           @delete="handleDeleteBook"
         />
@@ -123,7 +174,7 @@ const rootBooks = MOCK_BOOKS.filter((b) => b.folderId === null);
 .section-header
   display: flex
   align-items: center
-  justify-content: space-between
+  gap: 10px
 
 .section-title
   font-size: 13px
@@ -132,7 +183,54 @@ const rootBooks = MOCK_BOOKS.filter((b) => b.folderId === null);
   letter-spacing: 0.05em
   color: #94a3b8
   margin: 0
+  white-space: nowrap
   line-height: 30px
+
+.header-actions
+  display: flex
+  gap: 6px
+  flex-shrink: 0
+
+.sort-active
+  color: #000000 !important
+
+.sort-panel
+  display: flex
+  flex-wrap: wrap
+  gap: 8px
+  padding: 12px 16px
+  border: 1px solid #e2e8f0
+  border-radius: 12px
+  background: #f8fafc
+
+.sort-option
+  display: flex
+  align-items: center
+  gap: 6px
+  font-size: 13px
+  font-weight: 500
+  color: #64748b
+  cursor: pointer
+  padding: 5px 10px
+  border-radius: 6px
+  border: 1px solid #e2e8f0
+  background: #fff
+  transition: all 0.15s ease
+  user-select: none
+
+  input[type="checkbox"]
+    accent-color: #000
+    width: 14px
+    height: 14px
+    cursor: pointer
+
+  &:hover
+    border-color: #cbd5e1
+
+  &--active
+    border-color: #000
+    color: #000
+    background: #f1f5f9
 
 .add-panel-container
   display: flex

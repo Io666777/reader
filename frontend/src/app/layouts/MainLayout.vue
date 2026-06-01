@@ -62,10 +62,10 @@ import { RouterLink } from "vue-router";
       left: 50%
       transform: translateX(-50%)
       width: 40px
-      height: 3px // Толщина линии
+      height: 3px
       background-color: #000000
       border-radius: 2px
-      
+
 .content
   flex: 1
   width: 100%

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { MOCK_FOLDERS } from "@/entities/book/model/mock";
-
 defineProps<{
   modelValue: string | null
+  items: { id: string; label: string }[]
+  title?: string
 }>()
 
 defineEmits(['update:modelValue'])
@@ -10,14 +10,14 @@ defineEmits(['update:modelValue'])
 
 <template>
   <div class="selector-container">
-    <span class="selector-title">Выбрать папку:</span>
-    <label v-for="folder in MOCK_FOLDERS" :key="folder.id" class="option-item">
-      <input 
-        type="radio" 
-        :checked="modelValue === folder.id"
-        @change="$emit('update:modelValue', folder.id)"
+    <span class="selector-title">{{ title ?? 'Выбрать:' }}</span>
+    <label v-for="item in items" :key="item.id" class="option-item">
+      <input
+        type="radio"
+        :checked="modelValue === item.id"
+        @change="$emit('update:modelValue', item.id)"
       />
-      {{ folder.title }}
+      {{ item.label }}
     </label>
   </div>
 </template>

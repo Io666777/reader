@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { MOCK_BOOKS } from "@/entities/book/model/mock";
-
 const props = defineProps<{
   modelValue: string[]
+  items: { id: string; label: string }[]
+  title?: string
 }>()
 
 const emit = defineEmits(['update:modelValue'])
 
-const toggleBook = (id: string) => {
+const toggleItem = (id: string) => {
   const newValue = [...props.modelValue]
   const index = newValue.indexOf(id)
   index === -1 ? newValue.push(id) : newValue.splice(index, 1)
@@ -17,14 +17,14 @@ const toggleBook = (id: string) => {
 
 <template>
   <div class="selector-container">
-    <span class="selector-title">Выбрать книги:</span>
-    <label v-for="book in MOCK_BOOKS" :key="book.id" class="option-item">
-      <input 
-        type="checkbox" 
-        :checked="modelValue.includes(book.id)"
-        @change="toggleBook(book.id)"
+    <span class="selector-title">{{ title ?? 'Выбрать:' }}</span>
+    <label v-for="item in items" :key="item.id" class="option-item">
+      <input
+        type="checkbox"
+        :checked="modelValue.includes(item.id)"
+        @change="toggleItem(item.id)"
       />
-      {{ book.title }}
+      {{ item.label }}
     </label>
   </div>
 </template>
