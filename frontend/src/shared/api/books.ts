@@ -8,6 +8,8 @@ interface CreateBookDto {
   author?: string
   description?: string
   folderId?: string
+  fileUrl?: string
+  fileType?: string
 }
 
 interface UpdateBookDto {

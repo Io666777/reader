@@ -12,6 +12,7 @@ const emit = defineEmits(["view-activity", "delete", "add-to-folder"]);
   <div class="book-card" :class="{ expanded: isExpanded }">
     <div class="main-row" @click="isExpanded = !isExpanded">
       <div class="meta-side">
+        <span v-if="book.fileType" class="file-badge">{{ book.fileType.toUpperCase() }}</span>
         <div class="titles">
           <h4 class="title">{{ book.title ?? 'Без названия' }}</h4>
           <p class="author">{{ book.author ?? 'Неизвестный автор' }}</p>
@@ -21,14 +22,17 @@ const emit = defineEmits(["view-activity", "delete", "add-to-folder"]);
 
     <Transition name="fade">
       <div v-if="isExpanded" class="details-panel">
+        <a v-if="book.fileUrl" :href="book.fileUrl" target="_blank" class="read-link">
+          <BaseButton variant="action">Читать</BaseButton>
+        </a>
         <BaseButton variant="action" @click="emit('view-activity', book.id)">
-          Посмотреть активности
+          Активность
         </BaseButton>
         <BaseButton variant="action" @click="emit('add-to-folder', book.id)">
           Назначить папку
         </BaseButton>
         <BaseButton variant="danger" @click="emit('delete', book.id)">
-          Удалить книгу
+          Удалить
         </BaseButton>
       </div>
     </Transition>
@@ -37,70 +41,49 @@ const emit = defineEmits(["view-activity", "delete", "add-to-folder"]);
 
 <style scoped lang="sass">
 .book-card
-  border-bottom: 1px solid #e2e8f0
-  overflow: hidden
-  transition: all 0.3s ease
-
-  &.expanded
-    background-color: #f8fafc
+  border-bottom: 1px solid #e5e7eb
 
 .main-row
   display: flex
   align-items: center
-  padding: 16px 20px
+  padding: 11px 0
   cursor: pointer
-  width: 100%
 
 .meta-side
   display: flex
   align-items: center
-  gap: 16px
+  gap: 10px
+  flex: 1
 
 .file-badge
-  font-size: 11px
-  font-weight: 700
-  color: #94a3b8
-  background-color: #f1f5f9
-  padding: 4px 8px
-  border-radius: 6px
+  font-size: 10px
+  font-weight: 600
+  letter-spacing: 0.04em
+  color: #9ca3af
+  flex-shrink: 0
 
 .titles
   display: flex
   flex-direction: column
+  gap: 2px
 
 .title
-  font-size: 15px
-  font-weight: 600
-  color: #000000
+  font-size: 14px
+  font-weight: 500
+  color: #111827
   margin: 0
 
 .author
-  font-size: 13px
-  color: #94a3b8
-  margin: 2px 0 0 0
+  font-size: 12px
+  color: #9ca3af
+  margin: 0
 
 .details-panel
-  padding: 0 20px 16px 60px
+  padding: 0 0 10px 0
   display: flex
-  gap: 10px
-  width: 100%
+  gap: 6px
+  flex-wrap: wrap
 
-.action-btn
-  padding: 8px 16px
-  border-radius: 8px
-  border: 1px solid #e2e8f0
-  background: #f9fafb
-  font-size: 12px
-  font-weight: 600
-  cursor: pointer
-  transition: all 0.2s
-
-  &.del
-    background: #f9fafb
-    color: #black
-    border: 1px solid #e2e8f0
-    margin-left: auto
-
-  &:hover
-    opacity: 0.8
+.read-link
+  text-decoration: none
 </style>

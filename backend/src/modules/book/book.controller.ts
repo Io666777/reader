@@ -36,6 +36,8 @@ export const createBook = async (c: Context) => {
       author: body.author || 'Неизвестный автор',
       description: body.description,
       image: body.image,
+      fileUrl: body.fileUrl,
+      fileType: body.fileType,
       users: {
         connect: { id: userId }
       }
@@ -80,7 +82,9 @@ export const updateBook = async (c: Context) => {
         title: body.title,
         author: body.author,
         description: body.description,
-        image: body.image
+        image: body.image,
+        fileUrl: body.fileUrl,
+        fileType: body.fileType,
       }
     });
 

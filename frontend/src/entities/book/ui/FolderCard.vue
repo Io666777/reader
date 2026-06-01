@@ -48,24 +48,32 @@ const isOpen = ref(false);
   display: flex
   justify-content: space-between
   align-items: center
-  padding: 12px 20px
-  background-color: #f8fafc
-  border: 1px solid #e2e8f0
-  border-radius: 12px
+  padding: 11px 14px
+  border: 1px solid #e5e7eb
+  border-radius: 8px
 
 .folder-info
   display: flex
   align-items: center
-  gap: 12px
+  gap: 10px
   cursor: pointer
   flex: 1
 
+.folder-name
+  font-size: 14px
+  font-weight: 500
+  color: #111827
+
+.count-badge
+  font-size: 12px
+  color: #9ca3af
+
 .folder-actions
   display: flex
-  gap: 8px
+  gap: 6px
 
 .folder-content
-  padding-left: 20px
-  border-left: 2px solid #e2e8f0
-  margin-top: 8px
+  margin-top: 4px
+  padding-left: 14px
+  border-left: 1px solid #e5e7eb
 </style>

@@ -6,6 +6,7 @@ import { trimTrailingSlash } from "hono/trailing-slash";
 import { clerkMiddleware } from '@clerk/hono';
 import bookRoute from './modules/book/book.routes';
 import folderRouter from "./modules/folder/folder.routes";
+import { makeUploadHandler } from './modules/upload/upload.routes';
 import { clerkAuthMiddleware } from "./middleware/auth";
 
 type Variables = {
@@ -19,6 +20,16 @@ app.use('*', cors())
 app.use('*', trimTrailingSlash())
 
 app.use('*', clerkMiddleware());
+
+const uploadHandler = makeUploadHandler()
+app.all('/api/uploadthing', async (c) => {
+  try {
+    return await uploadHandler(c.req.raw)
+  } catch (err) {
+    console.error('[uploadthing] handler error:', err)
+    return c.json({ error: 'Upload failed' }, 500)
+  }
+})
 
 app.use('/api/books/*', clerkAuthMiddleware());
 app.route('/api/books', bookRoute);

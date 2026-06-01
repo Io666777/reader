@@ -26,6 +26,8 @@ export function useBooks() {
   const bookSearch = ref('')
   const bookName = ref('')
   const bookAuthor = ref('')
+  const bookFileUrl = ref<string | null>(null)
+  const bookFileType = ref<string | null>(null)
   const selectedFolderId = ref<string | null>(null)
   const activeSorts = ref<BookSortKey[]>([])
 
@@ -73,11 +75,15 @@ export function useBooks() {
         title: bookName.value,
         author: bookAuthor.value || undefined,
         folderId: selectedFolderId.value || undefined,
+        fileUrl: bookFileUrl.value || undefined,
+        fileType: bookFileType.value || undefined,
       })
       await fetchBooks()
       bookName.value = ''
       bookAuthor.value = ''
       selectedFolderId.value = null
+      bookFileUrl.value = null
+      bookFileType.value = null
       isAddingBook.value = false
     } catch (e: any) {
       error.value = e.message
@@ -118,6 +124,8 @@ export function useBooks() {
     bookSearch,
     bookName,
     bookAuthor,
+    bookFileUrl,
+    bookFileType,
     selectedFolderId,
     activeSorts,
     filteredRootBooks,

@@ -26,27 +26,27 @@ defineEmits(['update:modelValue'])
 .selector-container
   display: flex
   flex-direction: column
-  gap: 8px
+  gap: 6px
   padding: 12px
-  border: 1px solid #e2e8f0
-  border-radius: 12px
-  max-height: 200px
+  border: 1px solid #e5e7eb
+  border-radius: 8px
+  max-height: 180px
   overflow-y: auto
 
 .selector-title
   font-size: 11px
-  font-weight: 700
-  color: #94a3b8
+  font-weight: 600
   text-transform: uppercase
-  margin-bottom: 4px
+  letter-spacing: 0.06em
+  color: #9ca3af
+  margin-bottom: 2px
 
 .option-item
   display: flex
   align-items: center
   gap: 8px
-  font-size: 14px
+  font-size: 13px
+  color: #111827
   cursor: pointer
-  padding: 4px 0
-  &:hover
-    color: #64748b
+  padding: 3px 0
 </style>

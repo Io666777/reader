@@ -21,53 +21,43 @@ import { RouterLink } from "vue-router";
 <style scoped lang="sass">
 .menu
   display: flex
-  justify-content: center
-  gap: 32px
   width: 100%
-  max-width: 500px
+  max-width: 560px
   margin: 0 auto
-  padding: 0
-  background: none
+  border-bottom: 1px solid #e5e7eb
 
 .menu-item
   position: relative
   display: flex
-  flex-direction: column
   align-items: center
   justify-content: center
   text-decoration: none
   flex: 1
-  padding: 12px 0 20px 0
-  background: none
-  border: none
-
-  color: #94a3b8
-  transition: color 0.2s ease
+  padding: 14px 0
+  font-size: 13px
+  font-weight: 500
+  color: #9ca3af
 
   span
-    font-size: 14px
-    font-weight: 600
-    margin-top: 6px
-
-  &:hover
-    color: #64748b
+    font-size: 13px
+    font-weight: 500
 
   &.active
-    color: #000000
+    color: #111827
 
     &::after
       content: ''
       position: absolute
-      bottom: 0
+      bottom: -1px
       left: 50%
       transform: translateX(-50%)
-      width: 40px
-      height: 3px
-      background-color: #000000
-      border-radius: 2px
+      width: 20px
+      height: 2px
+      background: #111827
+      border-radius: 1px
 
 .content
   flex: 1
   width: 100%
-  padding: 20px
+  padding: 28px 20px
 </style>

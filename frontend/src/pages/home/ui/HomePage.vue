@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
 import { BookCard, FolderCard } from "@/entities/book";
-import { BaseButton, BaseInput, BookSelector, FolderSelector } from "@/shared/ui";
+import { BaseButton, BaseInput, BookSelector, FolderSelector, FileUpload } from "@/shared/ui";
 import { useFolders, FOLDER_SORT_OPTIONS } from "../model/useFolders";
 import { useBooks, BOOK_SORT_OPTIONS } from "../model/useBooks";
 
 const {
   books, isLoading: isBooksLoading, isSubmitting: isBookSubmitting, error: booksError,
   isAddingBook, isFolderMenuOpen, isSortOpen: isBookSortOpen,
-  bookSearch, bookName, bookAuthor, selectedFolderId,
+  bookSearch, bookName, bookAuthor, bookFileUrl, bookFileType, selectedFolderId,
   activeSorts: bookActiveSorts, filteredRootBooks,
   fetchBooks, createBook, deleteBook,
   toggleAddBook, toggleSort: toggleBookSort, handleViewActivity,
@@ -174,6 +174,7 @@ const folderSelectorItems = computed(() =>
           <div class="add-panel">
             <BaseInput v-model="bookName" placeholder="Название книги" />
             <BaseInput v-model="bookAuthor" placeholder="Автор" />
+            <FileUpload v-model="bookFileUrl" :fileType="bookFileType" @update:fileType="bookFileType = $event" />
             <BaseButton variant="action" :disabled="!bookName.trim() || isBookSubmitting" @click="createBook">Добавить</BaseButton>
             <BaseButton variant="action" @click="isFolderMenuOpen = !isFolderMenuOpen">
               {{ selectedFolderId ? "Папка выбрана" : "Выбрать папку" }}
@@ -200,11 +201,11 @@ const folderSelectorItems = computed(() =>
 
 <style scoped lang="sass">
 .home-page
-  max-width: 700px
+  max-width: 600px
   margin: 0 auto
   display: flex
   flex-direction: column
-  gap: 40px
+  gap: 48px
 
 .section
   display: flex
@@ -214,96 +215,81 @@ const folderSelectorItems = computed(() =>
 .section-header
   display: flex
   align-items: center
-  gap: 10px
+  gap: 8px
 
 .section-title
-  font-size: 13px
-  font-weight: 700
+  font-size: 11px
+  font-weight: 600
   text-transform: uppercase
-  letter-spacing: 0.05em
-  color: #94a3b8
+  letter-spacing: 0.08em
+  color: #9ca3af
   margin: 0
   white-space: nowrap
-  line-height: 30px
 
 .header-actions
   display: flex
-  gap: 6px
+  gap: 8px
   flex-shrink: 0
 
 .sort-active
-  color: #000000 !important
+  color: #111827 !important
 
 .sort-panel
   display: flex
   flex-wrap: wrap
-  gap: 8px
-  padding: 12px 16px
-  border: 1px solid #e2e8f0
-  border-radius: 12px
-  background: #f8fafc
+  gap: 10px
+  padding: 4px 0
 
 .sort-option
   display: flex
   align-items: center
   gap: 6px
   font-size: 13px
-  font-weight: 500
-  color: #64748b
+  color: #6b7280
   cursor: pointer
-  padding: 5px 10px
-  border-radius: 6px
-  border: 1px solid #e2e8f0
-  background: #fff
-  transition: all 0.15s ease
   user-select: none
 
   input[type="checkbox"]
-    accent-color: #000
-    width: 14px
-    height: 14px
+    accent-color: #111827
+    width: 13px
+    height: 13px
     cursor: pointer
-
-  &:hover
-    border-color: #cbd5e1
+    flex-shrink: 0
 
   &--active
-    border-color: #000
-    color: #000
-    background: #f1f5f9
+    color: #111827
+    font-weight: 500
 
 .add-panel-container
   display: flex
   flex-direction: column
-  gap: 10px
-  margin-bottom: 10px
+  gap: 8px
 
 .add-panel
   display: flex
-  justify-content: space-between
   align-items: center
-  gap: 10px
-  padding: 16px
-  border: 1px solid #e2e8f0
-  border-radius: 12px
+  gap: 8px
+  padding: 10px 12px
+  border: 1px solid #e5e7eb
+  border-radius: 8px
 
 .error-text
   font-size: 13px
-  color: #e53e3e
+  color: #ef4444
   margin: 0
 
 .loading-text
   font-size: 13px
-  color: #94a3b8
+  color: #9ca3af
   margin: 0
 
 .books-paper
   display: flex
   flex-direction: column
-  border-top: 1px solid #e2e8f0
+  border-top: 1px solid #e5e7eb
 
 .folders-grid
   display: flex
   flex-direction: column
-  gap: 20px
+  gap: 8px
 </style>
