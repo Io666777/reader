@@ -83,6 +83,10 @@ const emit = defineEmits(["view-activity", "delete", "add-to-folder"]);
   display: flex
   gap: 6px
   flex-wrap: wrap
+  +sm
+    gap: 8px
+    :deep(.base-btn)
+      flex: 1
 
 .read-link
   text-decoration: none

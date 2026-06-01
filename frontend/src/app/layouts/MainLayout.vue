@@ -60,4 +60,6 @@ import { RouterLink } from "vue-router";
   flex: 1
   width: 100%
   padding: 28px 20px
+  +sm
+    padding: 20px 14px
 </style>

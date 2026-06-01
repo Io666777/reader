@@ -51,6 +51,9 @@ const isOpen = ref(false);
   padding: 11px 14px
   border: 1px solid #e5e7eb
   border-radius: 8px
+  +sm
+    flex-wrap: wrap
+    gap: 8px
 
 .folder-info
   display: flex
@@ -71,6 +74,8 @@ const isOpen = ref(false);
 .folder-actions
   display: flex
   gap: 6px
+  +sm
+    width: 100%
 
 .folder-content
   margin-top: 4px

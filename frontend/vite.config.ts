@@ -12,7 +12,7 @@ export default defineConfig({
   css: {
     preprocessorOptions: {
       sass: {
-
+        additionalData: '@import "@/app/styles/variables"\n@import "@/app/styles/mixins"\n'
       }
     }
   }

@@ -206,6 +206,8 @@ const folderSelectorItems = computed(() =>
   display: flex
   flex-direction: column
   gap: 48px
+  +sm
+    gap: 36px
 
 .section
   display: flex
@@ -216,6 +218,13 @@ const folderSelectorItems = computed(() =>
   display: flex
   align-items: center
   gap: 8px
+  +sm
+    flex-wrap: wrap
+    .header-actions
+      margin-left: auto
+    :deep(.base-input)
+      order: 1
+      flex-basis: 100%
 
 .section-title
   font-size: 11px
@@ -272,6 +281,9 @@ const folderSelectorItems = computed(() =>
   padding: 10px 12px
   border: 1px solid #e5e7eb
   border-radius: 8px
+  +sm
+    flex-direction: column
+    align-items: stretch
 
 .error-text
   font-size: 13px
