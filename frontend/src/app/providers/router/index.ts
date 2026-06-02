@@ -1,64 +1,52 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import {authStore} from '../../../shared/store/auth'
-import pageCatalog from '../../../pages/pageCatalog/index.vue'
-import pageList from '../../../pages/pageList/index.vue'
-import pageLogin from '../../../pages/pageLogin/index.vue' 
-import profilPage from '../../../pages/profilPage/index.vue'
-import defaultPage from '../../../pages/defaultPage.vue'
-
-const routes = [
-  {
-    path: '/',
-    component: defaultPage,
-    children: [
-      {
-        path: '',
-        name: 'home',
-        component: pageList,
-      },
-      {
-        path: 'catalog',
-        name: 'catalog',
-        component: pageCatalog,
-      },
-      {
-        path: 'book/:id',
-        name: 'bookDetals',
-        component: () => import('../../../pages/bookDetalsPage/index.vue')
-      },
-      {
-        path: 'login',
-        name: 'login',
-        component: pageLogin,
-        meta: { guestOnly: true }
-      },
-      {
-        path: 'profil',
-        name: 'profil',
-        component: profilPage,
-      },
-    ]
-  }, 
-  
-]
+import { useAuth } from '@clerk/vue'
 
 const router = createRouter({
   history: createWebHistory(),
-  routes
+  routes: [
+    {
+      path: '/auth',
+      component: () => import('@/pages/auth/ui/AuthPage.vue')
+    },
+    {
+      path: '/',
+      component: () => import('@/app/layouts/MainLayout.vue'),
+      children: [
+        {
+          path: '',
+          component: () => import('@/pages/home/ui/HomePage.vue')
+        },
+        {
+          path: 'activity',
+          component: () => import('@/pages/activity/ui/ActivityPage.vue')
+        },
+        {
+          path: 'profile',
+          component: () => import('@/pages/profile/ui/ProfilePage.vue')
+        },
+        {
+          path: 'reader/:bookId',
+          component: () => import('@/pages/reader/ui/ReaderPage.vue')
+        }
+      ]
+    }
+  ]
 })
 
-router.beforeEach((to, _from, next) => {
-  const isAuth = authStore.isAuth.value
+router.beforeEach((to) => {
+  const { isSignedIn, isLoaded } = useAuth()
 
-  if (to.meta.requiresAuth && !isAuth) {
-    return next({ name: 'login' })
+  if (!isLoaded.value) return true
+
+  if (!to.path.startsWith('/auth') && !isSignedIn.value) {
+    return { path: '/auth' }
   }
 
-  if (to.meta.guestOnly && isAuth) {
-    return next({ name: 'home' })
+  if (to.path === '/auth' && isSignedIn.value) {
+    return { path: '/' }
   }
 
-  next()
+  return true
 })
 
 export default router

@@ -3,10 +3,15 @@ import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
 import{ cors } from 'hono/cors'
 import { trimTrailingSlash } from "hono/trailing-slash";
-
-import bookRoute from './resourses/route'
-import authRoute from './resourses/authRoute'
-import { authenticate } from "./utils/middleware";
+import { clerkMiddleware } from '@clerk/hono';
+import bookRoute from './modules/book/book.routes';
+import folderRouter from "./modules/folder/folder.routes";
+import eventRouter from "./modules/event/event.routes";
+import { makeUploadHandler } from './modules/upload/upload.routes';
+import userRouter from './modules/user/user.routes';
+import { sendEventReminderEmails } from './modules/email/email.service';
+import cron from 'node-cron';
+import { clerkAuthMiddleware } from "./middleware/auth";
 
 type Variables = {
   jwtPayload: { id: string }
@@ -18,10 +23,33 @@ const port = Number(process.env.PORT) || 16000;
 app.use('*', cors())
 app.use('*', trimTrailingSlash())
 
-app.route('/api/auth', authRoute)
-app.use('/api/books/*', authenticate)
-app.route('/api/books', bookRoute)
+app.use('*', clerkMiddleware());
 
+const uploadHandler = makeUploadHandler()
+app.all('/api/uploadthing', async (c) => {
+  try {
+    return await uploadHandler(c.req.raw)
+  } catch (err) {
+    console.error('[uploadthing] handler error:', err)
+    return c.json({ error: 'Upload failed' }, 500)
+  }
+})
+
+app.use('/api/books/*', clerkAuthMiddleware());
+app.route('/api/books', bookRoute);
+
+app.use('/api/folders/*', clerkAuthMiddleware())
+app.route('/api/folders', folderRouter)
+
+app.use('/api/events/*', clerkAuthMiddleware())
+app.route('/api/events', eventRouter)
+
+app.use('/api/user/*', clerkAuthMiddleware())
+app.route('/api/user', userRouter)
+
+cron.schedule('0 9 * * *', () => {
+  sendEventReminderEmails().catch(e => console.error('[cron] sendEventReminderEmails:', e))
+})
 
 app.get('/', (c) => {
   return c.text('Hello Honods!')
