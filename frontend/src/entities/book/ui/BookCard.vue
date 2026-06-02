@@ -1,9 +1,20 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import type { Book } from "../model/types";
 import BaseButton from "@/shared/ui/BaseButton.vue";
 
-defineProps<{ book: Book; disabled?: boolean }>();
+interface EventBadge { id: string; title: string; dueDate: string }
+
+const props = defineProps<{ book: Book; disabled?: boolean; events?: EventBadge[] }>();
+
+const nearestEvent = computed(() =>
+  props.events?.length
+    ? props.events.reduce((a, b) => a.dueDate < b.dueDate ? a : b)
+    : null
+)
+
+const fmtDate = (iso: string) =>
+  new Date(iso).toLocaleDateString('ru', { day: 'numeric', month: 'short' })
 const isExpanded = ref(false);
 const emit = defineEmits(["view-activity", "delete", "add-to-folder", "create-event"]);
 </script>
@@ -18,6 +29,10 @@ const emit = defineEmits(["view-activity", "delete", "add-to-folder", "create-ev
           <p class="author">{{ book.author ?? 'Неизвестный автор' }}</p>
         </div>
       </div>
+      <span v-if="nearestEvent" class="event-tag">
+        до {{ fmtDate(nearestEvent.dueDate) }}
+        <span v-if="(events?.length ?? 0) > 1" class="event-more">+{{ (events?.length ?? 0) - 1 }}</span>
+      </span>
     </div>
 
     <Transition name="fade">
@@ -80,6 +95,15 @@ const emit = defineEmits(["view-activity", "delete", "add-to-folder", "create-ev
   font-size: 12px
   color: #9ca3af
   margin: 0
+
+.event-tag
+  font-size: 11px
+  color: #3b82f6
+  white-space: nowrap
+  flex-shrink: 0
+
+.event-more
+  color: #9ca3af
 
 .details-panel
   padding: 0 0 10px 0

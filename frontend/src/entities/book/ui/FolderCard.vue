@@ -1,14 +1,26 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import type { Folder, Book } from "../model/types";
 import BookCard from "./BookCard.vue";
 import BaseButton from "@/shared/ui/BaseButton.vue";
+
+interface EventBadge { id: string; title: string; dueDate: string }
 
 const props = defineProps<{
   folder: Folder;
   books: Book[];
   disabled?: boolean;
+  events?: EventBadge[];
 }>();
+
+const nearestEvent = computed(() =>
+  props.events?.length
+    ? props.events.reduce((a, b) => a.dueDate < b.dueDate ? a : b)
+    : null
+)
+
+const fmtDate = (iso: string) =>
+  new Date(iso).toLocaleDateString('ru', { day: 'numeric', month: 'short' })
 
 // Добавляем события управления папкой
 const emit = defineEmits(["view-activity", "book-remove", "remove-folder", "edit-folder", "add-to-folder", "create-event"]);
@@ -22,6 +34,10 @@ const isOpen = ref(false);
       <div class="folder-info" @click="isOpen = !isOpen">
         <span class="folder-name">{{ folder.name }}</span>
         <span class="count-badge">{{ books.length }} книг</span>
+        <span v-if="nearestEvent" class="event-tag">
+          до {{ fmtDate(nearestEvent.dueDate) }}
+          <span v-if="(events?.length ?? 0) > 1" class="event-more">+{{ (events?.length ?? 0) - 1 }}</span>
+        </span>
       </div>
       
       <div class="folder-actions">
@@ -72,6 +88,14 @@ const isOpen = ref(false);
 
 .count-badge
   font-size: 12px
+  color: #9ca3af
+
+.event-tag
+  font-size: 11px
+  color: #3b82f6
+  white-space: nowrap
+
+.event-more
   color: #9ca3af
 
 .folder-actions

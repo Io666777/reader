@@ -223,6 +223,7 @@ const formatRange = (ev: { startDate: string | null; dueDate: string }) =>
     </section>
 
     <p v-if="!isLoading && !events.length" class="empty-text">Событий пока нет</p>
+
   </div>
 </template>
 
@@ -427,4 +428,5 @@ const formatRange = (ev: { startDate: string | null; dueDate: string }) =>
   color: #9ca3af
   text-align: center
   padding: 24px 0
+
 </style>

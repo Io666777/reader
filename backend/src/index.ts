@@ -8,6 +8,9 @@ import bookRoute from './modules/book/book.routes';
 import folderRouter from "./modules/folder/folder.routes";
 import eventRouter from "./modules/event/event.routes";
 import { makeUploadHandler } from './modules/upload/upload.routes';
+import userRouter from './modules/user/user.routes';
+import { sendEventReminderEmails } from './modules/email/email.service';
+import cron from 'node-cron';
 import { clerkAuthMiddleware } from "./middleware/auth";
 
 type Variables = {
@@ -40,6 +43,13 @@ app.route('/api/folders', folderRouter)
 
 app.use('/api/events/*', clerkAuthMiddleware())
 app.route('/api/events', eventRouter)
+
+app.use('/api/user/*', clerkAuthMiddleware())
+app.route('/api/user', userRouter)
+
+cron.schedule('0 9 * * *', () => {
+  sendEventReminderEmails().catch(e => console.error('[cron] sendEventReminderEmails:', e))
+})
 
 app.get('/', (c) => {
   return c.text('Hello Honods!')

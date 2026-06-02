@@ -12,9 +12,11 @@ model User {
   username  String?
   createdAt DateTime @default(now())
 
-  folders Folder[]
-  books   Book[]
-  events  Event[]
+  folders               Folder[]
+  books                 Book[]
+  events                Event[]
+  telegramChatId        String?
+  emailNotifications    Boolean  @default(true)
 }
 
 model Folder {

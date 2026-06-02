@@ -19,6 +19,10 @@ const router = createRouter({
         {
           path: 'activity',
           component: () => import('@/pages/activity/ui/ActivityPage.vue')
+        },
+        {
+          path: 'profile',
+          component: () => import('@/pages/profile/ui/ProfilePage.vue')
         }
       ]
     }

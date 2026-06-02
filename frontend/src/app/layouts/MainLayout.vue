@@ -11,6 +11,10 @@ import { RouterLink } from "vue-router";
     <RouterLink to="/activity" class="menu-item" :exact-active-class="'active'">
       <span>Активность</span>
     </RouterLink>
+
+    <RouterLink to="/profile" class="menu-item" :exact-active-class="'active'">
+      <span>Профиль</span>
+    </RouterLink>
   </nav>
 
   <main class="content">

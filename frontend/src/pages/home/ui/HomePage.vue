@@ -5,6 +5,7 @@ import { BookCard, FolderCard } from "@/entities/book";
 import { BaseButton, BaseInput, BookSelector, FileUpload } from "@/shared/ui";
 import { useFolders, FOLDER_SORT_OPTIONS } from "../model/useFolders";
 import { useBooks, BOOK_SORT_OPTIONS } from "../model/useBooks";
+import { useHomeEvents } from "../model/useHomeEvents";
 
 const {
   books, isLoading: isBooksLoading, isSubmitting: isBookSubmitting,
@@ -28,6 +29,28 @@ const {
 
 const router = useRouter()
 
+const { events: homeEvents, fetchEvents: fetchHomeEvents } = useHomeEvents()
+
+const bookEventMap = computed(() => {
+  const map = new Map<string, typeof homeEvents.value>()
+  homeEvents.value.filter(e => e.bookId).forEach(e => {
+    const arr = map.get(e.bookId!) ?? []
+    arr.push(e)
+    map.set(e.bookId!, arr)
+  })
+  return map
+})
+
+const folderEventMap = computed(() => {
+  const map = new Map<string, typeof homeEvents.value>()
+  homeEvents.value.filter(e => e.folderId).forEach(e => {
+    const arr = map.get(e.folderId!) ?? []
+    arr.push(e)
+    map.set(e.folderId!, arr)
+  })
+  return map
+})
+
 const handleCreateEvent = (payload: { folderId?: string; bookId?: string; label: string }) => {
   router.push({
     path: '/activity',
@@ -43,6 +66,7 @@ const handleCreateEvent = (payload: { folderId?: string; bookId?: string; label:
 onMounted(() => {
   fetchBooks()
   fetchFolders()
+  fetchHomeEvents()
 })
 
 // Назначение папок книге (multi-select)
@@ -159,6 +183,7 @@ const folderSelectorItems = computed(() =>
           :key="folder.id"
           :folder="folder"
           :books="getBooksInFolder(folder.id)"
+          :events="folderEventMap.get(folder.id)"
           :disabled="deletingFolderId === folder.id || isFolderSubmitting"
           @edit-folder="handleEditFolder"
           @remove-folder="deleteFolder"
@@ -242,6 +267,7 @@ const folderSelectorItems = computed(() =>
           v-for="book in filteredBooks"
           :key="book.id"
           :book="book"
+          :events="bookEventMap.get(book.id)"
           :disabled="deletingBookId === book.id"
           @view-activity="handleViewActivity"
           @add-to-folder="handleAddToFolder"
