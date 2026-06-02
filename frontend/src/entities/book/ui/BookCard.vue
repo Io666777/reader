@@ -1,7 +1,16 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
+import { useRouter } from "vue-router";
 import type { Book } from "../model/types";
 import BaseButton from "@/shared/ui/BaseButton.vue";
+
+const router = useRouter();
+const readingProgress = ref(0)
+
+onMounted(() => {
+  const saved = localStorage.getItem(`reading-progress-${props.book.id}`)
+  if (saved) readingProgress.value = Number(saved)
+})
 
 interface EventBadge { id: string; title: string; dueDate: string }
 
@@ -21,6 +30,9 @@ const emit = defineEmits(["view-activity", "delete", "add-to-folder", "create-ev
 
 <template>
   <div class="book-card" :class="{ expanded: isExpanded }">
+    <div v-if="readingProgress > 0" class="card-progress">
+      <div class="card-progress-fill" :style="{ width: readingProgress + '%' }" />
+    </div>
     <div class="main-row" @click="isExpanded = !isExpanded">
       <div class="meta-side">
         <span v-if="book.fileType" class="file-badge">{{ book.fileType.toUpperCase() }}</span>
@@ -37,9 +49,9 @@ const emit = defineEmits(["view-activity", "delete", "add-to-folder", "create-ev
 
     <Transition name="fade">
       <div v-if="isExpanded" class="details-panel">
-        <a v-if="book.fileUrl" :href="book.fileUrl" target="_blank" class="read-link">
-          <BaseButton variant="action">Читать</BaseButton>
-        </a>
+        <BaseButton v-if="book.fileUrl" variant="action" @click="router.push(`/reader/${book.id}`)">
+          Читать
+        </BaseButton>
         <BaseButton variant="action" :disabled="disabled" @click="emit('view-activity', book.id)">
           Активность
         </BaseButton>
@@ -60,6 +72,20 @@ const emit = defineEmits(["view-activity", "delete", "add-to-folder", "create-ev
 <style scoped lang="sass">
 .book-card
   border-bottom: 1px solid #e5e7eb
+  position: relative
+
+.card-progress
+  position: absolute
+  bottom: 0
+  left: 0
+  right: 0
+  height: 2px
+  background: #f3f4f6
+
+.card-progress-fill
+  height: 100%
+  background: #111827
+  border-radius: 0 1px 1px 0
 
 .main-row
   display: flex
@@ -114,7 +140,4 @@ const emit = defineEmits(["view-activity", "delete", "add-to-folder", "create-ev
     gap: 8px
     :deep(.base-btn)
       flex: 1
-
-.read-link
-  text-decoration: none
 </style>

@@ -23,6 +23,10 @@ const router = createRouter({
         {
           path: 'profile',
           component: () => import('@/pages/profile/ui/ProfilePage.vue')
+        },
+        {
+          path: 'reader/:bookId',
+          component: () => import('@/pages/reader/ui/ReaderPage.vue')
         }
       ]
     }
@@ -34,7 +38,7 @@ router.beforeEach((to) => {
 
   if (!isLoaded.value) return true
 
-  if (to.path !== '/auth' && !isSignedIn.value) {
+  if (!to.path.startsWith('/auth') && !isSignedIn.value) {
     return { path: '/auth' }
   }
 

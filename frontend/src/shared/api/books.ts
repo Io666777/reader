@@ -26,6 +26,9 @@ export const createBooksApi = (getToken: () => Promise<string | null>) => ({
   getAll: () =>
     apiRequest<ApiResponse<Book[]>>('/books', getToken),
 
+  getById: (id: string) =>
+    apiRequest<ApiResponse<Book>>(`/books/${id}`, getToken),
+
   create: (data: CreateBookDto) =>
     apiRequest<ApiResponse<Book>>('/books', getToken, { method: 'POST', body: data }),
 

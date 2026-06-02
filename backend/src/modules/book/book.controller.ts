@@ -1,6 +1,23 @@
 import type { Context } from 'hono';
 import prisma from '../../lib/prisma';
 
+export const getBook = async (c: Context) => {
+  try {
+    const userId = c.get('jwtPayload').id
+    const bookId = c.req.param('id')
+
+    const book = await prisma.book.findFirst({
+      where: { id: bookId, users: { some: { id: userId } } },
+      include: { folders: true },
+    })
+
+    if (!book) return c.json({ success: false, error: 'Книга не найдена' }, 404)
+    return c.json({ success: true, data: book })
+  } catch {
+    return c.json({ success: false, error: 'Ошибка сервера' }, 500)
+  }
+}
+
 export const getUserBooks = async (c: Context) => {
   try {
     const userId = c.get('jwtPayload').id;
