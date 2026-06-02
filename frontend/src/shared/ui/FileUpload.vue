@@ -10,6 +10,12 @@ const { uploadFiles } = genUploader({ url: `${apiBase}/uploadthing` })
 
 const ALLOWED = ['fb2', 'docx', 'txt']
 
+const ACCEPT = [
+  '.fb2', 'application/x-fb2', 'application/x-fictionbook+xml',
+  '.docx', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  '.txt', 'text/plain',
+].join(',')
+
 defineProps<{ modelValue: string | null }>()
 
 const emit = defineEmits<{
@@ -57,7 +63,7 @@ const handleFile = async (e: Event) => {
       <input
         type="file"
         class="hidden-input"
-        :accept="'.' + ALLOWED.join(',.')"
+        :accept="ACCEPT"
         :disabled="isUploading"
         @change="handleFile"
       />
