@@ -1,5 +1,17 @@
 services:
   - type: web
+    name: reader-backend
+    env: node
+    rootDir: backend
+    buildCommand: npm install && npx prisma generate && npm run build
+    startCommand: npm start
+    envVars:
+      - key: PORT
+        value: 16000
+      - key: NODE_ENV
+        value: production
+
+  - type: web
     name: reader-frontend
     env: static
     rootDir: frontend
