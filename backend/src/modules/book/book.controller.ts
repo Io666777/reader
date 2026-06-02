@@ -1,6 +1,23 @@
 import type { Context } from 'hono';
 import prisma from '../../lib/prisma';
 
+export const getBook = async (c: Context) => {
+  try {
+    const userId = c.get('jwtPayload').id
+    const bookId = c.req.param('id')
+
+    const book = await prisma.book.findFirst({
+      where: { id: bookId, users: { some: { id: userId } } },
+      include: { folders: true },
+    })
+
+    if (!book) return c.json({ success: false, error: 'Книга не найдена' }, 404)
+    return c.json({ success: true, data: book })
+  } catch {
+    return c.json({ success: false, error: 'Ошибка сервера' }, 500)
+  }
+}
+
 export const getUserBooks = async (c: Context) => {
   try {
     const userId = c.get('jwtPayload').id;
@@ -36,6 +53,8 @@ export const createBook = async (c: Context) => {
       author: body.author || 'Неизвестный автор',
       description: body.description,
       image: body.image,
+      fileUrl: body.fileUrl,
+      fileType: body.fileType,
       users: {
         connect: { id: userId }
       }
@@ -74,14 +93,31 @@ export const updateBook = async (c: Context) => {
       return c.json({ success: false, error: 'Книга не найдена или доступ запрещен' }, 404);
     }
 
+    const data: any = {
+      title: body.title,
+      author: body.author,
+      description: body.description,
+      image: body.image,
+      fileUrl: body.fileUrl,
+      fileType: body.fileType,
+    }
+
+    if ('folderIds' in body) {
+      const userFolders = await prisma.folder.findMany({
+        where: { userId },
+        select: { id: true }
+      })
+      const ids: string[] = body.folderIds ?? []
+      data.folders = {
+        disconnect: userFolders.map(f => ({ id: f.id })),
+        ...(ids.length ? { connect: ids.map((id: string) => ({ id })) } : {})
+      }
+    }
+
     const updatedBook = await prisma.book.update({
       where: { id: bookId },
-      data: {
-        title: body.title,
-        author: body.author,
-        description: body.description,
-        image: body.image
-      }
+      data,
+      include: { folders: true }
     });
 
     return c.json({ success: true, data: updatedBook });
@@ -95,21 +131,27 @@ export const deleteBook = async (c: Context) => {
     const userId = c.get('jwtPayload').id;
     const bookId = c.req.param('id');
 
+    const existingBook = await prisma.book.findFirst({
+      where: { id: bookId, users: { some: { id: userId } } },
+      include: { folders: { where: { userId } } }
+    });
+
+    if (!existingBook) {
+      return c.json({ success: false, error: 'Книга не найдена или доступ запрещен' }, 404);
+    }
+
     const updatedBook = await prisma.book.update({
       where: { id: bookId },
       data: {
-        users: {
-          disconnect: { id: userId } 
-        },
-
+        users: { disconnect: { id: userId } },
         folders: {
-          disconnect: { userId: userId }
+          disconnect: existingBook.folders.map(f => ({ id: f.id }))
         }
       }
     });
 
     return c.json({ success: true, data: updatedBook, message: 'Книга успешно удалена из вашей библиотеки' });
   } catch (error) {
-    return c.json({ success: false, error: 'Книга не найдена или доступ запрещен' }, 404);
+    return c.json({ success: false, error: 'Ошибка сервера при удалении книги' }, 500);
   }
 };

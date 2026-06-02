@@ -1,32 +1,57 @@
-# Vue 3 + TypeScript + Vite
+# Frontend
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+Vue 3 SPA на Vite + TypeScript + SASS.
 
-Learn more about the recommended Project Setup and IDE Support in the [Vue Docs TypeScript Guide](https://vuejs.org/guide/typescript/overview.html#project-setup).
+## Запуск
 
+```bash
+npm install
+npm run dev      # Vite dev server
+npm run build    # vue-tsc + vite build → dist/
+npm run preview  # предпросмотр продакшн-сборки
+```
+
+## Переменные окружения
+
+Создай файл `.env` в корне `frontend/`:
+
+```env
+VITE_API_URL=http://localhost:16000/api
+VITE_CLERK_PUBLISHABLE_KEY=pk_...
+```
+
+При деплое замени `VITE_API_URL` на URL продакшн-бэкенда.
+
+## Структура (Feature-Sliced Design)
+
+```
 src/
-├── app/                # Инициализация (App.vue, router, store, styles)
-│   ├── providers/      # Обертки (Vue Router, Pinia)
-│   └── index.ts        # Точка входа
-│
-├── pages/              # Целые страницы (композиция фич)
-│   ├── search-page/    # Страница поиска
-│   └── library-page/   # Страница "Моя полка"
-│
-├── widgets/            # Крупные блоки (Header, BookList + Actions)
-│   └── book-catalog/   # Сетка книг с кнопками управления
-│
-├── features/           # Действия пользователя (User Intent)
-│   ├── add-book/       # Логика кнопки "Добавить" (POST /add)
-│   ├── delete-book/    # Логика удаления (DELETE /id)
-│   └── search-by-title/# Поисковая строка (GET /search)
-│
-├── entities/           # Бизнес-единицы (Data & UI модели)
-│   └── book/           # Компонент карточки (BookCard), типы (interface Book)
-│
-├── shared/             # Переиспользуемый "фундамент"
-│   ├── api/            # Базовый инстанс axios/fetch
-│   └── ui/             # Кнопки, инпуты, лоадеры (BaseButton.vue)
+├── app/
+│   ├── layouts/        # MainLayout (навигация + контент)
+│   ├── providers/
+│   │   └── router/     # Vue Router + Clerk guard
+│   └── styles/         # глобальные стили, переменные, миксины
+├── pages/
+│   ├── home/           # полка книг и папок
+│   ├── activity/       # события, дедлайны, heatmap
+│   ├── reader/         # ридер FB2 / DOCX / PDF
+│   └── profile/        # email, уведомления, выход
+├── entities/
+│   ├── book/           # BookCard, FolderCard, типы
+│   └── event/          # типы событий
+├── features/
+│   └── auth-by-clerk/  # форма входа/регистрации
+└── shared/
+    ├── api/            # фабрики API-клиентов (books, events, folders, user)
+    └── ui/             # BaseButton, BaseInput, FileUpload и др.
+```
 
-### Библиотеки
-npm install axios
+## Форматы книг
+
+| Формат | Рендеринг |
+|--------|-----------|
+| FB2 | XML-парсер на клиенте → HTML |
+| DOCX | mammoth.js → HTML |
+| PDF | нативный `<iframe>` браузера |
+
+Позиция чтения сохраняется в `localStorage` по `bookId`.

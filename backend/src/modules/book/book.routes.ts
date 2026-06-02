@@ -1,12 +1,12 @@
 import { Hono } from 'hono';
-import { getUserBooks, createBook, updateBook, deleteBook } from './book.controller';
+import { getUserBooks, getBook, createBook, updateBook, deleteBook } from './book.controller';
 
-const folderRouter = new Hono();
+const bookRouter = new Hono();
 
-folderRouter.get('/', getUserBooks);
-folderRouter.post('/', createBook);
-folderRouter.post('/:id', updateBook)
-folderRouter.post('/:id', deleteBook)
+bookRouter.get('/', getUserBooks);
+bookRouter.get('/:id', getBook);
+bookRouter.post('/', createBook);
+bookRouter.put('/:id', updateBook);
+bookRouter.delete('/:id', deleteBook);
 
-
-export default folderRouter;
+export default bookRouter;
