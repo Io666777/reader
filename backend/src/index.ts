@@ -22,7 +22,7 @@ const port = Number(process.env.PORT) || 16000;
 
 app.use('*', cors({
   origin: (origin) => origin ?? '*',
-  allowHeaders: ['Authorization', 'Content-Type', 'x-uploadthing-package', 'x-uploadthing-version'],
+  allowHeaders: [],
   allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
 }))
 app.use('*', trimTrailingSlash())
