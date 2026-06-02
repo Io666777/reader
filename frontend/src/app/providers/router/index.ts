@@ -5,7 +5,7 @@ const router = createRouter({
   history: createWebHistory(),
   routes: [
     {
-      path: '/auth',
+      path: '/auth/:pathMatch(.*)*',
       component: () => import('@/pages/auth/ui/AuthPage.vue')
     },
     {
