@@ -21,7 +21,7 @@ const app = new Hono<{ Variables: Variables }>()
 const port = Number(process.env.PORT) || 16000;
 
 app.use('*', cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: (origin) => origin ?? '*',
   allowHeaders: ['Authorization', 'Content-Type'],
   allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
 }))
